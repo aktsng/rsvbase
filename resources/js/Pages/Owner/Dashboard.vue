@@ -165,19 +165,29 @@
                     'border border-slate-100 p-0 text-center h-12 relative',
                     day.is_weekend ? 'bg-slate-50/50' : 'bg-white'
                   ]">
-                <!-- 予約あり -->
+                <!-- 予約あり (プログレスインジケーター風) -->
                 <Link v-if="room.days[day.date] && room.days[day.date].type === 'reserved'" 
                       :href="route('owner.reservations.show', room.days[day.date].uuid)"
-                      class="flex flex-col items-center justify-center w-full h-full hover:bg-emerald-50 transition"
-                      :title="`${room.days[day.date].guest_name}（${room.days[day.date].nights}泊）`">
-                  <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <!-- 連泊インジケーター -->
-                  <div v-if="room.days[day.date].position !== 'single'" class="text-emerald-400 leading-none" style="font-size: 9px; margin-top: 1px;">
-                    <span v-if="room.days[day.date].position === 'start'">←</span>
-                    <span v-else-if="room.days[day.date].position === 'middle'">—</span>
-                    <span v-else-if="room.days[day.date].position === 'end'">→</span>
+                      class="flex items-center justify-center w-full h-full hover:bg-emerald-50/50 transition relative group"
+                      :title="`${room.days[day.date].guest_name}（${room.days[day.date].nights}泊）` ">
+                  
+                  <!-- 背景の接続線 -->
+                  <div v-if="room.days[day.date].position !== 'single'" 
+                       class="absolute top-1/2 -translate-y-1/2 h-0.5 bg-emerald-200"
+                       :class="[
+                         room.days[day.date].position === 'start' ? 'left-1/2 right-0' : '',
+                         room.days[day.date].position === 'middle' ? 'left-0 right-0' : '',
+                         room.days[day.date].position === 'end' ? 'left-0 right-1/2' : '',
+                       ]">
+                  </div>
+
+                  <!-- インジケーターの円 -->
+                  <div class="relative z-10 w-6 h-6 rounded-full flex items-center justify-center shadow-sm transition transform group-hover:scale-110"
+                       :class="room.days[day.date].day_number === 1 ? 'bg-emerald-500 text-white' : 'bg-white border-2 border-emerald-500 text-emerald-600 font-bold'">
+                    <svg v-if="room.days[day.date].day_number === 1" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span v-else class="text-[10px]">{{ room.days[day.date].day_number }}</span>
                   </div>
                 </Link>
                 <!-- 部屋ブロック中 -->
@@ -202,14 +212,20 @@
       </div>
       <div class="px-6 py-3 bg-slate-50 border-t border-slate-100 flex flex-wrap gap-4 text-xs text-slate-500">
         <div class="flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-          </svg>
-          <span>予約あり（クリックで詳細）</span>
+          <div class="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <span>予約あり</span>
         </div>
         <div class="flex items-center gap-1.5">
-          <span class="text-emerald-400 text-[10px] font-medium">← — →</span>
-          <span>連泊</span>
+          <div class="flex items-center">
+            <div class="w-4 h-4 rounded-full border border-emerald-500 bg-white flex items-center justify-center text-[8px] text-emerald-600 font-bold">2</div>
+            <div class="w-3 h-0.5 bg-emerald-200"></div>
+            <div class="w-4 h-4 rounded-full border border-emerald-500 bg-white flex items-center justify-center text-[8px] text-emerald-600 font-bold">3</div>
+          </div>
+          <span>連泊（2日目〜）</span>
         </div>
         <div class="flex items-center gap-1.5">
           <span class="font-bold text-slate-200 text-sm">◯</span>

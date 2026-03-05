@@ -63,6 +63,7 @@ class DashboardController extends Controller
                 $nights = $res->check_in_date->diffInDays($res->check_out_date);
 
                 // チェックインからチェックアウト前日までを「予約あり」とする
+                $dayNumber = 1;
                 for ($d = $res->check_in_date->copy(); $d->lt($res->check_out_date); $d->addDay()) {
                     $dateStr = $d->toDateString();
                     if ($d->between($startOfMonth, $endOfMonth)) {
@@ -86,8 +87,10 @@ class DashboardController extends Controller
                             'reservation_id' => $res->id,
                             'nights' => $nights,
                             'position' => $position,
+                            'day_number' => $dayNumber,
                         ];
                     }
+                    $dayNumber++;
                 }
             }
 
