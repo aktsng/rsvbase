@@ -1,0 +1,83 @@
+<template>
+  <OwnerLayout>
+    <Head title="部屋一覧" />
+    <template #header>部屋の管理</template>
+
+    <div class="max-w-5xl mx-auto py-6">
+      <div v-if="!facility_is_published" class="mb-6 p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl flex gap-3">
+        <svg class="w-6 h-6 shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div>
+          <p class="text-sm">施設が非公開のため、ゲストは現在部屋を予約できません。公開状態は<Link :href="route('owner.facility.edit')" class="font-semibold underline">施設設定</Link>から変更できます。</p>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-slate-800">登録済みの部屋</h2>
+        <Link :href="route('owner.rooms.create')" 
+              class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white font-medium text-sm rounded-lg hover:bg-primary-700 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          新しい部屋を追加
+        </Link>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-600">
+            <thead class="bg-slate-50 text-slate-500 font-medium">
+              <tr>
+                <th class="px-6 py-4">部屋名</th>
+                <th class="px-6 py-4">定員</th>
+                <th class="px-6 py-4">基本料金</th>
+                <th class="px-6 py-4">清掃費</th>
+                <th class="px-6 py-4">ステータス</th>
+                <th class="px-6 py-4 text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr v-for="room in rooms" :key="room.uuid" class="hover:bg-slate-50 transition">
+                <td class="px-6 py-4">
+                  <div class="font-bold text-slate-800">{{ room.name }}</div>
+                </td>
+                <td class="px-6 py-4">{{ room.capacity }} 名</td>
+                <td class="px-6 py-4 text-slate-800 font-medium">¥{{ room.base_price_per_night.toLocaleString() }}</td>
+                <td class="px-6 py-4 text-slate-800 font-medium">¥{{ room.cleaning_fee.toLocaleString() }}</td>
+                <td class="px-6 py-4">
+                  <span v-if="room.is_active" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 shrink-0">公開</span>
+                  <span v-else class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800 shrink-0">非公開</span>
+                </td>
+                <td class="px-6 py-4 text-right space-x-3">
+                  <Link :href="route('owner.rooms.calendar', room.uuid)" class="text-primary-600 hover:text-primary-900 font-medium text-sm">カレンダー</Link>
+                  <Link :href="route('owner.rooms.special-prices.index', room.uuid)" class="text-primary-600 hover:text-primary-900 font-medium text-sm">特定日料金</Link>
+                  <Link :href="route('owner.rooms.edit', room.uuid)" class="text-slate-500 hover:text-slate-800 font-medium text-sm">編集</Link>
+                </td>
+              </tr>
+              <tr v-if="rooms.length === 0">
+                <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+                  <svg class="mx-auto h-12 w-12 text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                  </svg>
+                  <p class="font-medium text-slate-600">まだ部屋が登録されていません</p>
+                  <p class="text-sm mt-1">「新しい部屋を追加」ボタンから最初の部屋を登録してください。</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </OwnerLayout>
+</template>
+
+<script setup>
+import { Head, Link } from '@inertiajs/vue3';
+import OwnerLayout from '@/Layouts/OwnerLayout.vue';
+
+defineProps({
+    rooms: Array,
+    facility_is_published: Boolean,
+});
+</script>
