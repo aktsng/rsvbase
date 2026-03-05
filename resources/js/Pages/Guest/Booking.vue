@@ -266,7 +266,7 @@
                 <div class="text-right sm:text-left text-slate-500 text-sm">
                   {{ t('total_price') }} ({{ room.nights_count }}{{ t('nights') }})
                   <div class="text-2xl font-bold text-slate-900 mt-1">¥{{ room.total_amount.toLocaleString() }}</div>
-                  <div class="text-xs mt-1">({{ t('cleaning_fee') }}: ¥{{ room.cleaning_fee.toLocaleString() }})</div>
+                  <div v-if="room.cleaning_fee > 0" class="text-xs mt-1">({{ t('cleaning_fee') }}: ¥{{ room.cleaning_fee.toLocaleString() }})</div>
                 </div>
                 <button @click="selectRoom(room)" class="mt-4 w-full py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition">
                   {{ t('book_this_room') }}
@@ -326,7 +326,7 @@
                   </div>
 
                   <!-- 清掃費 -->
-                  <div class="flex justify-between text-sm py-1">
+                  <div v-if="selectedRoom.cleaning_fee > 0" class="flex justify-between text-sm py-1">
                     <span class="text-slate-600">{{ t('cleaning_fee') }}</span>
                     <span class="font-medium text-slate-800">¥{{ selectedRoom.cleaning_fee.toLocaleString() }}</span>
                   </div>
