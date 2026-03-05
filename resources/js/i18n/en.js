@@ -46,6 +46,9 @@ export default {
     back_to_booking: 'Back to Booking',
     confirm_booking: 'Booking Summary',
     total_payment: 'Total Amount',
+    price_details: 'Price Breakdown',
+    subtotal: 'Subtotal',
+    total: 'Total',
     guest_count_suffix: ' guest(s)',
 
     // Payment

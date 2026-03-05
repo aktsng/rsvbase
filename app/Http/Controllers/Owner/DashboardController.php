@@ -60,14 +60,32 @@ class DashboardController extends Controller
         foreach ($rooms as $room) {
             $mappedRes = [];
             foreach ($allReservations->where('room_id', $room->id) as $res) {
+                $nights = $res->check_in_date->diffInDays($res->check_out_date);
+
                 // チェックインからチェックアウト前日までを「予約あり」とする
                 for ($d = $res->check_in_date->copy(); $d->lt($res->check_out_date); $d->addDay()) {
                     $dateStr = $d->toDateString();
                     if ($d->between($startOfMonth, $endOfMonth)) {
+                        $isFirstDay = $d->isSameDay($res->check_in_date);
+                        $isLastDay = $d->copy()->addDay()->isSameDay($res->check_out_date);
+
+                        if ($isFirstDay && $isLastDay) {
+                            $position = 'single';
+                        } elseif ($isFirstDay) {
+                            $position = 'start';
+                        } elseif ($isLastDay) {
+                            $position = 'end';
+                        } else {
+                            $position = 'middle';
+                        }
+
                         $mappedRes[$dateStr] = [
                             'type' => 'reserved',
                             'uuid' => $res->uuid,
                             'guest_name' => $res->guest_name,
+                            'reservation_id' => $res->id,
+                            'nights' => $nights,
+                            'position' => $position,
                         ];
                     }
                 }

@@ -301,6 +301,46 @@
                   <div class="text-2xl font-bold text-slate-900 leading-none mt-1">¥{{ selectedRoom.total_amount.toLocaleString() }}</div>
                 </div>
               </div>
+
+              <!-- お支払い明細 -->
+              <div class="mt-6 border-t border-slate-100 pt-6">
+                <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">{{ t('price_details') }}</h3>
+                <div class="space-y-3">
+                  <!-- 日別の宿泊料金 -->
+                  <div v-for="price in selectedRoom.daily_prices" :key="price.date" class="flex flex-col sm:flex-row sm:justify-between gap-1 text-sm border-b border-slate-50 pb-2">
+                    <div class="flex flex-col">
+                      <span class="text-slate-700 font-medium">{{ price.date }} ({{ price.label }})</span>
+                      <div v-if="selectedRoom.pricing_type === 'person'" class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                        {{ t('guests_label') }}: ¥{{ price.price.toLocaleString() }} × {{ searchForm.adults }}{{ t('guests_unit') }}
+                        <template v-if="price.addChildAFee > 0 && searchForm.child_a > 0">
+                          <br>
+                          {{ child_settings?.child_a_label || '子供A' }}: ¥{{ price.addChildAFee.toLocaleString() }} × {{ searchForm.child_a }}名
+                        </template>
+                        <template v-if="price.addChildBFee > 0 && searchForm.child_b > 0">
+                          <br>
+                          {{ child_settings?.child_b_label || '子供B' }}: ¥{{ price.addChildBFee.toLocaleString() }} × {{ searchForm.child_b }}名
+                        </template>
+                      </div>
+                    </div>
+                    <span class="font-bold text-slate-800 text-right">¥{{ price.dayTotal.toLocaleString() }}</span>
+                  </div>
+
+                  <!-- 清掃費 -->
+                  <div class="flex justify-between text-sm py-1">
+                    <span class="text-slate-600">{{ t('cleaning_fee') }}</span>
+                    <span class="font-medium text-slate-800">¥{{ selectedRoom.cleaning_fee.toLocaleString() }}</span>
+                  </div>
+
+                  <!-- 合計金額 -->
+                  <div class="flex justify-between items-center pt-4 border-t border-slate-200 mt-2">
+                    <span class="text-lg font-bold text-slate-900">{{ t('total') }}</span>
+                    <div class="text-right">
+                      <span class="text-xs text-slate-400 block mb-0.5">{{ t('total_payment') }} ({{ t('tax_inclusive') || '税込' }})</span>
+                      <span class="text-3xl font-black text-primary-600 tracking-tight">¥{{ selectedRoom.total_amount.toLocaleString() }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Stripe決済フォーム -->

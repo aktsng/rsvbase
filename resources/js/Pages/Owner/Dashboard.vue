@@ -168,11 +168,17 @@
                 <!-- 予約あり -->
                 <Link v-if="room.days[day.date] && room.days[day.date].type === 'reserved'" 
                       :href="route('owner.reservations.show', room.days[day.date].uuid)"
-                      class="flex items-center justify-center w-full h-full text-emerald-500 font-black hover:bg-emerald-50 transition"
-                      :title="room.days[day.date].guest_name">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      class="flex flex-col items-center justify-center w-full h-full hover:bg-emerald-50 transition"
+                      :title="`${room.days[day.date].guest_name}（${room.days[day.date].nights}泊）`">
+                  <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                   </svg>
+                  <!-- 連泊インジケーター -->
+                  <div v-if="room.days[day.date].position !== 'single'" class="text-emerald-400 leading-none" style="font-size: 9px; margin-top: 1px;">
+                    <span v-if="room.days[day.date].position === 'start'">←</span>
+                    <span v-else-if="room.days[day.date].position === 'middle'">—</span>
+                    <span v-else-if="room.days[day.date].position === 'end'">→</span>
+                  </div>
                 </Link>
                 <!-- 部屋ブロック中 -->
                 <div v-else-if="room.days[day.date] && room.days[day.date].type === 'blocked'" 
@@ -200,6 +206,10 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
           </svg>
           <span>予約あり（クリックで詳細）</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-emerald-400 text-[10px] font-medium">← — →</span>
+          <span>連泊</span>
         </div>
         <div class="flex items-center gap-1.5">
           <span class="font-bold text-slate-200 text-sm">◯</span>

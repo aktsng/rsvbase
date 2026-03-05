@@ -46,6 +46,9 @@ export default {
     back_to_booking: '予約ページに戻る',
     confirm_booking: 'ご予約内容の確認',
     total_payment: '合計お支払い金額',
+    price_details: 'お支払い詳細',
+    subtotal: '小計',
+    total: '合計',
     guest_count_suffix: '名様のご宿泊',
 
     // Payment

@@ -231,6 +231,7 @@ class GuestController extends Controller
                 // 料金タイプ情報
                 'pricing_type' => $room->pricing_type ?? 'room',
                 'min_guests' => $room->min_guests ?? 1,
+                'daily_prices' => $priceBreakdown->toBookedPriceDetails(),
             ];
 
             // 人数単価の場合は詳細情報を追加
