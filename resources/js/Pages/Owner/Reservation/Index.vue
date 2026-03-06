@@ -3,6 +3,8 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import OwnerLayout from '@/Layouts/OwnerLayout.vue';
 import { ref, computed, watch } from 'vue';
 import axios from 'axios';
+import DateRangePicker from '@/Components/DateRangePicker.vue';
+import { useI18n } from '@/composables/useI18n.js';
 
 const props = defineProps({
     reservations: Object,
@@ -29,11 +31,22 @@ const processingCancel = ref(false);
 const refundAmount = ref(0);
 const cancelWithoutRefund = ref(false);
 
+const formatDateHelper = (date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+};
+const todayStr = formatDateHelper(new Date());
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+const tomorrowStr = formatDateHelper(tomorrow);
+
 // 新規予約フォーム
 const registerForm = useForm({
     room_id: '',
-    check_in_date: '',
-    check_out_date: '',
+    check_in_date: todayStr,
+    check_out_date: tomorrowStr,
     number_of_guests: 1,
     number_of_adults: 1,
     number_of_child_a: 0,
@@ -43,6 +56,29 @@ const registerForm = useForm({
     guest_phone: '',
     guest_remarks: '',
     owner_memo: '',
+});
+
+const { t, isEn } = useI18n();
+
+const dateRange = ref({
+    checkIn: registerForm.check_in_date,
+    checkOut: registerForm.check_out_date,
+});
+
+// dateRange が変わったら registerForm に反映
+watch(dateRange, (newVal) => {
+    if (newVal.checkIn) registerForm.check_in_date = newVal.checkIn;
+    if (newVal.checkOut) registerForm.check_out_date = newVal.checkOut;
+}, { deep: true });
+
+// モーダルが開いたときや初期化時に dateRange を同期
+watch(() => showRegisterModal.value, (newVal) => {
+    if (newVal) {
+        dateRange.value = {
+            checkIn: registerForm.check_in_date,
+            checkOut: registerForm.check_out_date,
+        };
+    }
 });
 
 // 選択された部屋の情報
@@ -61,19 +97,28 @@ const registerStep = ref('input');
 const calculatedPrice = ref(null);
 const calculating = ref(false);
 
-const handleCheckInChange = () => {
-    if (registerForm.check_in_date) {
-        const checkIn = new Date(registerForm.check_in_date);
-        const checkOut = new Date(registerForm.check_out_date);
-        
-        // チェックアウトが未入力、またはチェックイン以前なら翌日にセット
-        if (!registerForm.check_out_date || checkOut <= checkIn) {
-            const nextDay = new Date(checkIn);
-            nextDay.setDate(nextDay.getDate() + 1);
-            registerForm.check_out_date = nextDay.toISOString().split('T')[0];
-        }
+// 部屋ごとの空き状況
+const roomAvailability = ref({});
+
+const fetchAvailability = async (roomId) => {
+    if (!roomId) {
+        roomAvailability.value = {};
+        return;
+    }
+    try {
+        const room = props.rooms.find(r => r.id === roomId);
+        if (!room) return;
+        const response = await axios.get(route('owner.rooms.availability', room.uuid));
+        roomAvailability.value = response.data;
+    } catch (error) {
+        console.error('Failed to fetch availability:', error);
     }
 };
+
+// 部屋が選択されたら空き状況を取得
+watch(() => registerForm.room_id, (newVal) => {
+    fetchAvailability(newVal);
+});
 
 const goToConfirm = async () => {
     calculating.value = true;
@@ -126,6 +171,7 @@ const closeRegisterModal = () => {
         registerForm.reset();
         registerStep.value = 'input';
         calculatedPrice.value = null;
+        roomAvailability.value = {};
     }, 300);
 };
 
@@ -398,15 +444,18 @@ const executeCancel = () => {
                     </select>
                     <p v-if="registerForm.errors.room_id" class="mt-1 text-xs text-red-500">{{ registerForm.errors.room_id }}</p>
                   </div>
-                  <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-2">チェックイン *</label>
-                    <input type="date" v-model="registerForm.check_in_date" @change="handleCheckInChange" required class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition" :class="{'border-red-500': registerForm.errors.check_in_date}" />
-                    <p v-if="registerForm.errors.check_in_date" class="mt-1 text-xs text-red-500">{{ registerForm.errors.check_in_date }}</p>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-2">チェックアウト *</label>
-                    <input type="date" v-model="registerForm.check_out_date" required class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition" :class="{'border-red-500': registerForm.errors.check_out_date}" />
-                    <p v-if="registerForm.errors.check_out_date" class="mt-1 text-xs text-red-500">{{ registerForm.errors.check_out_date }}</p>
+                  <div class="sm:col-span-2">
+                    <DateRangePicker
+                      v-model="dateRange"
+                      :check-in-label="t('check_in')"
+                      :check-out-label="t('check_out')"
+                      :nights-label="isEn ? 'night(s)' : '泊'"
+                      :availability="roomAvailability"
+                    />
+                    <div v-if="registerForm.errors.check_in_date || registerForm.errors.check_out_date" class="mt-2 space-y-1">
+                      <p v-if="registerForm.errors.check_in_date" class="text-xs text-red-500">{{ registerForm.errors.check_in_date }}</p>
+                      <p v-if="registerForm.errors.check_out_date" class="text-xs text-red-500">{{ registerForm.errors.check_out_date }}</p>
+                    </div>
                   </div>
                   <div>
                     <label class="block text-xs font-bold text-slate-500 mb-2">大人 *</label>

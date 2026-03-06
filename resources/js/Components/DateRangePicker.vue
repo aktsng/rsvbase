@@ -72,6 +72,16 @@
             <!-- 今日マーカー -->
             <span v-else-if="cell.isToday && !isInRange(cell.dateStr)"
                   class="absolute w-9 h-9 rounded-full border-2 border-primary-300 z-0"></span>
+            
+            <!-- 予約状況・ブロック表示 -->
+            <div v-if="availability[cell.dateStr] && cell.dateStr !== modelValue.checkIn && cell.dateStr !== modelValue.checkOut"
+                 class="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
+              <span v-if="availability[cell.dateStr].type === 'reserved'" 
+                    class="w-1 h-1 rounded-full bg-emerald-500"></span>
+              <span v-if="availability[cell.dateStr].type === 'blocked'" 
+                    class="w-1 h-1 rounded-full bg-slate-400"></span>
+            </div>
+
             <span class="relative z-10" :class="cellClass(cell)">{{ cell.day }}</span>
           </button>
         </div>
@@ -99,6 +109,10 @@ const props = defineProps({
   checkInLabel: { type: String, default: '' },
   checkOutLabel: { type: String, default: '' },
   nightsLabel: { type: String, default: '' },
+  availability: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -175,6 +189,19 @@ const nextMonth = () => {
   }
 };
 
+// チェックイン後に選択可能な最後の日付を計算
+const firstReservedDateAfterCheckIn = computed(() => {
+    const ci = props.modelValue.checkIn;
+    if (!ci || isSelectingCheckIn.value) return null;
+    
+    // 現在のチェックイン日より後の予約・ブロック日をすべて取得
+    const futureReservedDates = Object.keys(props.availability)
+        .filter(d => d >= ci && (props.availability[d].type === 'reserved' || props.availability[d].type === 'blocked'))
+        .sort();
+    
+    return futureReservedDates.length > 0 ? futureReservedDates[0] : null;
+});
+
 // カレンダーセルの生成
 const calendarCells = computed(() => {
   const year = currentYear.value;
@@ -194,10 +221,30 @@ const calendarCells = computed(() => {
     const date = new Date(year, month, d);
     const dateStr = formatDateStr(date);
     const dow = date.getDay();
+    const isReserved = props.availability[dateStr]?.type === 'blocked' || props.availability[dateStr]?.type === 'reserved';
+    
+    let isDisabled = date < today;
+    
+    if (isSelectingCheckIn.value) {
+      // チェックイン選択時は、予約済みの日は選択不可
+      isDisabled = isDisabled || isReserved;
+    } else {
+      // チェックアウト選択時
+      const ci = props.modelValue.checkIn;
+      if (dateStr <= ci) {
+        // チェックイン日以前は不可
+        isDisabled = true;
+      } else if (firstReservedDateAfterCheckIn.value) {
+        // 途中に予約がある場合、その予約開始日より後のチェックアウトは不可
+        // (例: 5日が予約済みなら、5日チェックアウトはOKだが6日以降はNG)
+        isDisabled = dateStr > firstReservedDateAfterCheckIn.value;
+      }
+    }
+
     cells.push({
       day: d,
       dateStr,
-      disabled: date < today,
+      disabled: isDisabled,
       isToday: dateStr === todayStr,
       isSunday: dow === 0,
       isSaturday: dow === 6,
@@ -211,15 +258,31 @@ const calendarCells = computed(() => {
 const selectDate = (dateStr) => {
   if (isSelectingCheckIn.value) {
     // チェックイン選択
+    // すでに予約・ブロックされている日は選択不可（disabledでガードされているはずだが念のため）
+    if (props.availability[dateStr]) return;
+
     emit('update:modelValue', { checkIn: dateStr, checkOut: null });
     isSelectingCheckIn.value = false;
   } else {
     // チェックアウト選択
     if (dateStr <= props.modelValue.checkIn) {
       // チェックイン以前の日付→チェックインをリセット
+      if (props.availability[dateStr]) return;
       emit('update:modelValue', { checkIn: dateStr, checkOut: null });
       isSelectingCheckIn.value = false;
     } else {
+      // 範囲内に予約・ブロックがあるかチェック
+      const ci = props.modelValue.checkIn;
+      const hasOverlap = Object.keys(props.availability).some(d => {
+        // チェックイン日〜チェックアウト前日までに予約・ブロックがあるか
+        return d >= ci && d < dateStr && (props.availability[d].type === 'reserved' || props.availability[d].type === 'blocked');
+      });
+
+      if (hasOverlap) {
+        // 重複がある場合は選択させない（または警告を表示してリセット）
+        return;
+      }
+
       emit('update:modelValue', { checkIn: props.modelValue.checkIn, checkOut: dateStr });
       isSelectingCheckIn.value = true;
     }
@@ -254,12 +317,19 @@ const cellClass = (cell) => {
   const classes = [];
   const ci = props.modelValue.checkIn;
   const co = props.modelValue.checkOut;
+  const avail = props.availability[cell.dateStr];
   
   if (cell.disabled) {
     classes.push('text-slate-200 cursor-not-allowed');
     return classes;
   }
   
+  // 予約・ブロック状況に応じた背景
+  if (!isInRange(cell.dateStr) && avail && cell.dateStr !== ci && cell.dateStr !== co) {
+    if (avail.type === 'reserved') classes.push('bg-emerald-50/50');
+    if (avail.type === 'blocked') classes.push('bg-slate-50 opacity-60');
+  }
+
   // チェックイン・チェックアウト日（選択済み）
   if (cell.dateStr === ci || cell.dateStr === co) {
     classes.push('text-white font-bold');
@@ -279,7 +349,7 @@ const cellClass = (cell) => {
   }
   
   if (cell.isToday && cell.dateStr !== ci && cell.dateStr !== co) {
-    classes.push('font-bold');
+    classes.push('font-bold border-b-2 border-primary-200 mb-[-2px]');
   }
   
   return classes;

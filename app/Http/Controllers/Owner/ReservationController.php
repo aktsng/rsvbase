@@ -466,4 +466,45 @@ class ReservationController extends Controller
             'child_b_label' => $room->child_b_label,
         ]);
     }
+    /**
+     * 部屋の空き状況を取得（カレンダー表示用）
+     */
+    public function getAvailability(Request $request, Room $room)
+    {
+        $facility = $this->getCurrentFacility($request);
+
+        if ($room->facility_id !== $facility->id) {
+            abort(403);
+        }
+
+        // 前後半年程度のデータを取得
+        $start = now()->subMonth()->startOfMonth();
+        $end = now()->addMonths(6)->endOfMonth();
+
+        $reservations = $room->reservations()
+            ->where('status', '!=', 'cancelled')
+            ->where('check_in_date', '<', $end)
+            ->where('check_out_date', '>', $start)
+            ->get();
+
+        $blocks = $room->blocks()
+            ->whereBetween('blocked_date', [$start, $end])
+            ->get();
+
+        $availability = [];
+
+        // 予約済みのマッピング
+        foreach ($reservations as $res) {
+            for ($d = $res->check_in_date->copy(); $d->lt($res->check_out_date); $d->addDay()) {
+                $availability[$d->toDateString()] = ['type' => 'reserved'];
+            }
+        }
+
+        // ブロックのマッピング
+        foreach ($blocks as $block) {
+            $availability[$block->blocked_date->toDateString()] = ['type' => 'blocked'];
+        }
+
+        return response()->json($availability);
+    }
 }

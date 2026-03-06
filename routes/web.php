@@ -80,6 +80,7 @@ Route::middleware(['auth', 'owner'])->prefix('owner')->name('owner.')->group(fun
         // 予約管理
         Route::get('reservations', [\App\Http\Controllers\Owner\ReservationController::class, 'index'])->name('reservations.index');
         Route::post('reservations', [\App\Http\Controllers\Owner\ReservationController::class, 'store'])->name('reservations.store');
+        Route::get('rooms/{room}/availability', [\App\Http\Controllers\Owner\ReservationController::class, 'getAvailability'])->name('rooms.availability');
         Route::post('reservations/calculate-price', [\App\Http\Controllers\Owner\ReservationController::class, 'calculatePrice'])->name('reservations.calculate-price');
         Route::get('reservations/{reservation}', [\App\Http\Controllers\Owner\ReservationController::class, 'show'])->name('reservations.show');
         Route::put('reservations/{reservation}', [\App\Http\Controllers\Owner\ReservationController::class, 'update'])->name('reservations.update');
