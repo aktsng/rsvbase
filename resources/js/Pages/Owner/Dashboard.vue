@@ -257,11 +257,11 @@
         <table class="w-full text-left text-sm text-slate-600">
           <thead class="bg-slate-50 text-slate-500 font-medium">
             <tr>
-              <th class="px-6 py-3">予約番号</th>
-              <th class="px-6 py-3">ゲスト名</th>
-              <th class="px-6 py-3">部屋</th>
-              <th class="px-6 py-3">チェックイン</th>
-              <th class="px-6 py-3 text-right">料金</th>
+              <th class="px-6 py-3 min-w-[120px]">予約番号</th>
+              <th class="px-6 py-3 min-w-[150px]">ゲスト名</th>
+              <th class="px-6 py-3 min-w-[120px]">部屋</th>
+              <th class="px-6 py-3 min-w-[120px]">チェックイン</th>
+              <th class="px-6 py-3 text-right min-w-[100px]">料金</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
