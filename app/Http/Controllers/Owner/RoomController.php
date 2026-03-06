@@ -49,12 +49,7 @@ class RoomController extends Controller
 
         // 室単価の場合は子供関連・追加料金フィールドをリセット
         if (($data['pricing_type'] ?? 'room') === 'room') {
-            $data['child_a_label'] = null;
-            $data['child_a_policy'] = null;
-            $data['child_a_is_counted'] = true;
-            $data['child_b_label'] = null;
-            $data['child_b_policy'] = null;
-            $data['child_b_is_counted'] = false;
+            // 室単価でもラベル等は保持し、追加料金のみリセット
             $data['add_child_a_fee'] = 0;
             $data['add_child_b_fee'] = 0;
         }
@@ -107,12 +102,7 @@ class RoomController extends Controller
 
         // 室単価の場合は子供関連・追加料金フィールドをリセット
         if (($data['pricing_type'] ?? 'room') === 'room') {
-            $data['child_a_label'] = null;
-            $data['child_a_policy'] = null;
-            $data['child_a_is_counted'] = true;
-            $data['child_b_label'] = null;
-            $data['child_b_policy'] = null;
-            $data['child_b_is_counted'] = false;
+            // 室単価でもラベル等は保持し、追加料金のみリセット
             $data['add_child_a_fee'] = 0;
             $data['add_child_b_fee'] = 0;
         }

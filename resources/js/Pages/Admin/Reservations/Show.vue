@@ -67,7 +67,16 @@
             </div>
             <div class="grid grid-cols-3 pt-2 border-t border-slate-50">
               <dt class="text-slate-500">宿泊人数</dt>
-              <dd class="col-span-2 text-slate-900">{{ reservation.number_of_guests }} 名</dd>
+              <dd class="col-span-2 text-slate-900">
+                <template v-if="reservation.number_of_child_a > 0 || reservation.number_of_child_b > 0">
+                  大人 {{ reservation.number_of_adults ?? reservation.number_of_guests }} 名
+                  <template v-if="reservation.number_of_child_a > 0"> / {{ reservation.child_a_label || '子供A' }} {{ reservation.number_of_child_a }} 名</template>
+                  <template v-if="reservation.number_of_child_b > 0"> / {{ reservation.child_b_label || '子供B' }} {{ reservation.number_of_child_b }} 名</template>
+                </template>
+                <template v-else>
+                  {{ reservation.number_of_guests }} 名
+                </template>
+              </dd>
             </div>
           </dl>
           

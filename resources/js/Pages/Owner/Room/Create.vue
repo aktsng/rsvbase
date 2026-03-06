@@ -137,7 +137,8 @@
               </div>
             </div>
 
-            <template v-if="form.pricing_type === 'person'">
+            <!-- 子供料金設定セクション -->
+            <div class="md:col-span-2 mt-2">
 
               <!-- 子供料金トグル -->
               <div class="md:col-span-2 mt-2">
@@ -147,7 +148,9 @@
                     <div class="w-11 h-6 bg-slate-200 rounded-full peer-checked:bg-primary-500 transition"></div>
                     <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition peer-checked:translate-x-5"></div>
                   </div>
-                  <span class="text-sm font-medium text-slate-700">子供料金を設定する</span>
+                  <span class="text-sm font-medium text-slate-700">
+                    {{ form.pricing_type === 'room' ? '子供ラベルを設定する' : '子供料金を設定する' }}
+                  </span>
                 </label>
               </div>
 
@@ -168,7 +171,7 @@
                              class="block w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-sm"
                              placeholder="例：12歳まで・定員に含む">
                     </div>
-                    <div>
+                    <div v-if="form.pricing_type === 'person'">
                       <label class="block text-sm font-medium text-slate-600 mb-1">追加料金 (1名)</label>
                       <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -190,7 +193,7 @@
                 </div>
 
                 <!-- 子供B設定 -->
-                <div class="md:col-span-2 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <div class="md:col-span-2 mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
                   <h4 class="font-bold text-slate-700 mb-3">子供B</h4>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -205,7 +208,7 @@
                              class="block w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-sm"
                              placeholder="例：3歳まで・添い寝">
                     </div>
-                    <div>
+                    <div v-if="form.pricing_type === 'person'">
                       <label class="block text-sm font-medium text-slate-600 mb-1">追加料金 (1名)</label>
                       <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -227,7 +230,7 @@
                   </div>
                 </div>
               </template>
-            </template>
+            </div>
 
             <!-- 説明 -->
             <div class="md:col-span-2 mt-4">
@@ -295,7 +298,7 @@ import { Head, useForm, Link } from '@inertiajs/vue3';
 import OwnerLayout from '@/Layouts/OwnerLayout.vue';
 
 const previews = ref([null, null, null]);
-const showChildSettings = ref(false);
+const showChildSettings = ref(true);
 
 const form = useForm({
     name: '',

@@ -123,7 +123,7 @@ const executeCancel = () => {
                 <div>
                   <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">利用人数</dt>
                   <dd class="text-slate-900">
-                    <template v-if="props.reservation.pricing_type === 'person' && (props.reservation.number_of_child_a > 0 || props.reservation.number_of_child_b > 0)">
+                    <template v-if="props.reservation.number_of_child_a > 0 || props.reservation.number_of_child_b > 0">
                       大人 {{ props.reservation.number_of_adults }} 名
                       <template v-if="props.reservation.number_of_child_a > 0">
                         / {{ props.reservation.child_a_label || '子供A' }} {{ props.reservation.number_of_child_a }} 名

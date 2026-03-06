@@ -176,16 +176,10 @@ class GuestController extends Controller
         $calcService = new BookingPriceCalculatorService();
 
         foreach ($rooms as $room) {
-            // 定員チェック: 部屋の pricing_type によって計算方法を分岐
-            if ($room->isPersonPricing()) {
-                // 人数単価: is_counted フラグで定員加算を判定
-                $occupancy = $adults
-                    + ($room->child_a_is_counted ? $childA : 0)
-                    + ($room->child_b_is_counted ? $childB : 0);
-            } else {
-                // 室単価: 全員カウント
-                $occupancy = $adults + $childA + $childB;
-            }
+            // 定員チェック: is_counted フラグで定員加算を判定
+            $occupancy = $adults
+                + ($room->child_a_is_counted ? $childA : 0)
+                + ($room->child_b_is_counted ? $childB : 0);
 
             if ($occupancy > $room->capacity) {
                 continue;

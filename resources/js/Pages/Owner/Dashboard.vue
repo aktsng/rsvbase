@@ -326,6 +326,7 @@
                       <p v-if="registerForm.errors.check_out_date" class="text-xs text-red-500">{{ registerForm.errors.check_out_date }}</p>
                     </div>
                   </div>
+                  <!-- 大人カウンター -->
                   <div>
                     <label class="block text-xs font-bold text-slate-500 mb-2">大人 *</label>
                     <div class="flex items-center gap-3">
@@ -343,7 +344,7 @@
                     <p v-if="registerForm.errors.number_of_guests" class="mt-1 text-xs text-red-500">{{ registerForm.errors.number_of_guests }}</p>
                   </div>
                   <!-- 子供Aカウンター -->
-                  <div v-if="selectedRoomForRegister?.pricing_type === 'person' && selectedRoomForRegister?.child_a_label">
+                  <div v-if="selectedRoomForRegister?.child_a_label">
                     <label class="block text-xs font-bold text-slate-500 mb-2">
                       {{ selectedRoomForRegister.child_a_label }}
                       <span v-if="selectedRoomForRegister.child_a_policy" class="text-xs text-slate-400 font-normal ml-1">{{ selectedRoomForRegister.child_a_policy }}</span>
@@ -362,7 +363,7 @@
                     </div>
                   </div>
                   <!-- 子供Bカウンター -->
-                  <div v-if="selectedRoomForRegister?.pricing_type === 'person' && selectedRoomForRegister?.child_b_label">
+                  <div v-if="selectedRoomForRegister?.child_b_label">
                     <label class="block text-xs font-bold text-slate-500 mb-2">
                       {{ selectedRoomForRegister.child_b_label }}
                       <span v-if="selectedRoomForRegister.child_b_policy" class="text-xs text-slate-400 font-normal ml-1">{{ selectedRoomForRegister.child_b_policy }}</span>

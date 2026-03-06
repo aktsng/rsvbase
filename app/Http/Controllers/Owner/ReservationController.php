@@ -319,16 +319,22 @@ class ReservationController extends Controller
             abort(403);
         }
 
+        $adults = $validated['number_of_adults'] ?? $validated['number_of_guests'];
+        $childA = $validated['number_of_child_a'] ?? 0;
+        $childB = $validated['number_of_child_b'] ?? 0;
+
+        // 定員計算（カウント対象のみ合算）
+        $occupancy = $adults
+            + ($room->child_a_is_counted ? $childA : 0)
+            + ($room->child_b_is_counted ? $childB : 0);
+
         // 定員チェック
-        if ($validated['number_of_guests'] > $room->capacity) {
-            return back()->withErrors(['number_of_guests' => "この部屋の定員は{$room->capacity}名です。"])->with('error', "定員（{$room->capacity}名）を超えています。");
+        if ($occupancy > $room->capacity) {
+            return back()->withErrors(['number_of_guests' => "この部屋の定員は{$room->capacity}名です。"])->with('error', "定員（カウント対象: {$occupancy}名 / 最大: {$room->capacity}名）を超えています。");
         }
 
         $checkIn = Carbon::parse($validated['check_in_date']);
         $checkOut = Carbon::parse($validated['check_out_date']);
-        $adults = $validated['number_of_adults'] ?? $validated['number_of_guests'];
-        $childA = $validated['number_of_child_a'] ?? 0;
-        $childB = $validated['number_of_child_b'] ?? 0;
 
         // 重複チェック (キャンセル済み以外を対象)
         $isReserved = $room->reservations()
@@ -416,18 +422,23 @@ class ReservationController extends Controller
             abort(403);
         }
 
-        // 定員チェック
-        if ($validated['number_of_guests'] > $room->capacity) {
-            return response()->json([
-                'error' => "この部屋の定員は{$room->capacity}名です。"
-            ], 422);
-        }
-
         $checkIn = Carbon::parse($validated['check_in_date']);
         $checkOut = Carbon::parse($validated['check_out_date']);
         $adults = $validated['number_of_adults'] ?? $validated['number_of_guests'];
         $childA = $validated['number_of_child_a'] ?? 0;
         $childB = $validated['number_of_child_b'] ?? 0;
+
+        // 定員計算（カウント対象のみ合算）
+        $occupancy = $adults
+            + ($room->child_a_is_counted ? $childA : 0)
+            + ($room->child_b_is_counted ? $childB : 0);
+
+        // 定員チェック
+        if ($occupancy > $room->capacity) {
+            return response()->json([
+                'error' => "この部屋の定員は{$room->capacity}名です。現在の入力では定員対象が{$occupancy}名となっています。"
+            ], 422);
+        }
 
         // 重複チェック
         $isReserved = $room->reservations()

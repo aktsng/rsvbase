@@ -111,7 +111,17 @@
             </div>
             <div style="margin-bottom: 8px;">
                 <span class="label">宿泊人数</span>
-                <span class="value">{{ $reservation->number_of_guests }} 名様</span>
+                <span class="value">
+                    @if($reservation->number_of_child_a > 0 || $reservation->number_of_child_b > 0)
+                        大人 {{ $reservation->number_of_adults ?? $reservation->number_of_guests }} 名様
+                        @if($reservation->number_of_child_a > 0) / {{ $room->child_a_label ?? '子供A' }}
+                        {{ $reservation->number_of_child_a }} 名様@endif
+                        @if($reservation->number_of_child_b > 0) / {{ $room->child_b_label ?? '子供B' }}
+                        {{ $reservation->number_of_child_b }} 名様@endif
+                    @else
+                        {{ $reservation->number_of_guests }} 名様
+                    @endif
+                </span>
             </div>
             <div style="margin-bottom: 8px;">
                 <span class="label">お支払い金額</span>

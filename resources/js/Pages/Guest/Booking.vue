@@ -90,9 +90,9 @@
                 </div>
 
                 <!-- 子供A -->
-                <div v-if="has_person_pricing">
+                <div v-if="child_settings?.child_a_label">
                   <label class="block text-sm font-medium text-slate-700 mb-1">
-                    {{ child_settings?.child_a_label || '子供A' }}
+                    {{ child_settings.child_a_label }}
                     <span v-if="child_settings?.child_a_policy" class="text-xs text-slate-400 ml-1">{{ child_settings.child_a_policy }}</span>
                   </label>
                   <div class="flex items-center gap-3">
@@ -110,7 +110,7 @@
                 </div>
 
                 <!-- 子供B -->
-                <div v-if="has_person_pricing && child_settings?.child_b_label">
+                <div v-if="child_settings?.child_b_label">
                   <label class="block text-sm font-medium text-slate-700 mb-1">
                     {{ child_settings.child_b_label }}
                     <span v-if="child_settings?.child_b_policy" class="text-xs text-slate-400 ml-1">{{ child_settings.child_b_policy }}</span>
