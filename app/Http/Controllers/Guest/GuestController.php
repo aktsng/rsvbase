@@ -347,6 +347,8 @@ class GuestController extends Controller
             'guest_email' => ['required', 'email', 'max:255'],
             'guest_phone' => ['required', 'string', 'max:50'],
             'guest_remarks' => ['nullable', 'string', 'max:1000'],
+            'check_in_time' => ['required', 'string', 'max:20'],
+            'transportation' => ['required', 'string', 'max:50'],
             'total_amount' => ['required', 'integer'],
         ]);
 
@@ -379,7 +381,8 @@ class GuestController extends Controller
             'guest_remarks' => $validated['guest_remarks'],
             'check_in_date' => $validated['check_in_date'],
             'check_out_date' => $validated['check_out_date'],
-            'check_in_time' => $facility->check_in_start_time ?? '15:00:00',
+            'check_in_time' => $validated['check_in_time'],
+            'transportation' => $validated['transportation'],
             'number_of_guests' => $adults + $childA + $childB,
             'number_of_adults' => $adults,
             'number_of_child_a' => $childA,

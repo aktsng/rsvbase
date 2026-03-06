@@ -108,6 +108,7 @@ class ReservationController extends Controller
                 'check_in_date' => $reservation->check_in_date->format('Y-m-d'),
                 'check_out_date' => $reservation->check_out_date->format('Y-m-d'),
                 'check_in_time' => $reservation->check_in_time,
+                'transportation' => $reservation->transportation,
                 'facility_uuid' => $reservation->room->facility->uuid ?? null,
                 'facility_name' => $reservation->room->facility->name ?? '不明',
                 'owner_name' => $reservation->room->facility->owner->name ?? '不明',

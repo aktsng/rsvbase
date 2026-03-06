@@ -60,6 +60,8 @@ export default {
     email_placeholder: 'example@email.com',
     phone_label: '電話番号',
     phone_placeholder: '090-1234-5678',
+    arrival_time_label: '到着予定時刻',
+    transportation_label: '交通手段',
     remarks_label: '備考',
     remarks_placeholder: 'ご要望などがございましたらご記入ください（到着時間など）',
     card_info_title: 'カード情報',

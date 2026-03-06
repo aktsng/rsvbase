@@ -40,6 +40,7 @@ class Reservation extends Model
         'owner_memo',
         'payment_method',
         'booking_source',
+        'transportation',
     ];
 
     protected function casts(): array

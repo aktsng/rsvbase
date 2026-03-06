@@ -149,6 +149,14 @@ const executeCancel = () => {
                   <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">チェックアウト</dt>
                   <dd class="text-slate-900 font-bold">{{ props.reservation.check_out_date }}</dd>
                 </div>
+                <div>
+                  <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">到着予定時刻</dt>
+                  <dd class="text-slate-900 font-bold">{{ props.reservation.check_in_time }}</dd>
+                </div>
+                <div>
+                  <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">交通手段</dt>
+                  <dd class="text-slate-900 font-bold">{{ props.reservation.transportation }}</dd>
+                </div>
                 <div v-if="props.reservation.guest_remarks" class="sm:col-span-2 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                   <dt class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">ゲストからの備考</dt>
                   <dd class="text-slate-700 text-sm whitespace-pre-line leading-relaxed italic">
@@ -261,7 +269,7 @@ const executeCancel = () => {
               <form @submit.prevent="saveMemo" class="space-y-4">
                 <label class="block text-xs font-bold text-primary-600 mb-2">メモ内容</label>
                 <textarea v-model="memoForm.owner_memo" rows="10" 
-                          placeholder="この予約に関するメモを残せます（ゲストの好みや対応履歴など）。他のスタッフと共有されますが、ゲストは見ることができません。"
+                          placeholder="この予約に関するメモを残せます（ゲストの好みや対応履歴など）。"
                           class="block w-full px-4 py-2 border border-primary-100 rounded-2xl leading-5 bg-primary-50/10 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 text-sm transition"></textarea>
                 
                 <div v-if="memoForm.recentlySuccessful" class="text-xs text-emerald-600 font-bold flex items-center gap-1">

@@ -115,6 +115,14 @@
                     class="value">{{ $reservation->check_out_date->format('Y年m月d日') }}（{{ substr($facility->check_out_time, 0, 5) }}まで）</span>
             </div>
             <div style="margin-bottom: 8px;">
+                <span class="label">到着予定</span>
+                <span class="value">{{ $reservation->check_in_time }}</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <span class="label">交通手段</span>
+                <span class="value">{{ $reservation->transportation }}</span>
+            </div>
+            <div style="margin-bottom: 8px;">
                 <span class="label">宿泊人数</span>
                 <span class="value">
                     @if($reservation->number_of_child_a > 0 || $reservation->number_of_child_b > 0)

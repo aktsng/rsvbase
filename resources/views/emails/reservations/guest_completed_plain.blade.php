@@ -14,6 +14,8 @@
 お部屋：{{ $room->name }}
 チェックイン：{{ $reservation->check_in_date->format('Y年m月d日') }}（{{ substr($facility->check_in_time_start, 0, 5) }}〜{{ substr($facility->check_in_time_end, 0, 5) }}）
 チェックアウト：{{ $reservation->check_out_date->format('Y年m月d日') }}（{{ substr($facility->check_out_time, 0, 5) }}まで）
+到着予定：{{ $reservation->check_in_time }}
+交通手段：{{ $reservation->transportation }}
 @if($reservation->number_of_child_a > 0 || $reservation->number_of_child_b > 0)
     宿泊人数：大人 {{ $reservation->number_of_adults ?? $reservation->number_of_guests }}
     名様@if($reservation->number_of_child_a > 0) / {{ $room->child_a_label ?? '子供A' }} {{ $reservation->number_of_child_a }}

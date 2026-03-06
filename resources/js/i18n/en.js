@@ -60,6 +60,8 @@ export default {
     email_placeholder: 'example@email.com',
     phone_label: 'Phone Number',
     phone_placeholder: '+81-90-1234-5678',
+    arrival_time_label: 'Estimated Arrival',
+    transportation_label: 'Transportation',
     remarks_label: 'Remarks',
     remarks_placeholder: 'Any special requests? (e.g. estimated arrival time)',
     card_info_title: 'Card Information',

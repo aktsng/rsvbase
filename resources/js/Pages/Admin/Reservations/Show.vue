@@ -65,6 +65,10 @@
               <dt class="text-slate-500">電話番号</dt>
               <dd class="col-span-2 text-slate-900">{{ reservation.guest_phone || '-' }}</dd>
             </div>
+            <div class="grid grid-cols-3">
+              <dt class="text-slate-500">交通手段</dt>
+              <dd class="col-span-2 font-medium text-slate-900">{{ reservation.transportation || '-' }}</dd>
+            </div>
             <div class="grid grid-cols-3 pt-2 border-t border-slate-50">
               <dt class="text-slate-500">宿泊人数</dt>
               <dd class="col-span-2 text-slate-900">

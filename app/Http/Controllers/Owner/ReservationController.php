@@ -61,6 +61,8 @@ class ReservationController extends Controller
                 'reservations.total_amount',
                 'reservations.status',
                 'reservations.guest_remarks',
+                'reservations.check_in_time',
+                'reservations.transportation',
                 'reservations.created_at'
             ])
             ->latest('reservations.created_at')
@@ -138,6 +140,8 @@ class ReservationController extends Controller
                 'refunded_amount' => $reservation->refunded_amount,
                 'stripe_fee' => $reservation->stripe_fee,
                 'platform_fee_refund_amount' => $reservation->platform_fee_refund_amount,
+                'check_in_time' => $reservation->check_in_time,
+                'transportation' => $reservation->transportation,
                 'owner_net_amount' => $reservation->owner_net_amount,
                 'stripe_payment_intent_id' => $reservation->stripe_payment_intent_id,
                 'created_at' => $reservation->created_at->format('Y/m/d H:i'),
@@ -306,8 +310,10 @@ class ReservationController extends Controller
             'guest_name' => ['required', 'string', 'max:255'],
             'guest_email' => ['nullable', 'email', 'max:255'],
             'guest_phone' => ['required', 'string', 'max:50'],
-            'guest_remarks' => ['nullable', 'string', 'max:1000'],
             'owner_memo' => ['nullable', 'string', 'max:5000'],
+            'guest_remarks' => ['nullable', 'string', 'max:5000'],
+            'check_in_time' => ['required', 'string', 'max:20'],
+            'transportation' => ['required', 'string', 'max:50'],
         ], [
             'check_in_date.after_or_equal' => 'チェックイン日は今日以降の日付を指定してください。',
             'check_out_date.after' => 'チェックアウト日はチェックイン日より後の日付を指定してください（同日は不可）。',
@@ -370,7 +376,8 @@ class ReservationController extends Controller
             'guest_name' => $validated['guest_name'],
             'guest_email' => $validated['guest_email'],
             'guest_phone' => $validated['guest_phone'],
-            'check_in_time' => $facility->check_in_start_time ?? '15:00:00',
+            'check_in_time' => $validated['check_in_time'],
+            'transportation' => $validated['transportation'],
             'number_of_guests' => $adults + $childA + $childB,
             'number_of_adults' => $adults,
             'number_of_child_a' => $childA,

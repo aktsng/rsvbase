@@ -408,6 +408,44 @@
                     <input type="tel" v-model="guestForm.phone" required :placeholder="t('phone_placeholder')"
                            class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition">
                   </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-slate-700 mb-1">{{ t('arrival_time_label') }}</label>
+                      <select v-model="guestForm.check_in_time" required
+                             class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition">
+                        <option value="未定">未定</option>
+                        <option value="15:00">15:00</option>
+                        <option value="15:30">15:30</option>
+                        <option value="16:00">16:00</option>
+                        <option value="16:30">16:30</option>
+                        <option value="17:00">17:00</option>
+                        <option value="17:30">17:30</option>
+                        <option value="18:00">18:00</option>
+                        <option value="18:30">18:30</option>
+                        <option value="19:00">19:00</option>
+                        <option value="19:30">19:30</option>
+                        <option value="20:00">20:00</option>
+                        <option value="20:30">20:30</option>
+                        <option value="21:00">21:00</option>
+                        <option value="21:30">21:30</option>
+                        <option value="22:00">22:00</option>
+                        <option value="22:30">22:30</option>
+                        <option value="23:00">23:00</option>
+                        <option value="23:30">23:30</option>
+                        <option value="24:00">24:00</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-slate-700 mb-1">{{ t('transportation_label') }}</label>
+                      <select v-model="guestForm.transportation" required
+                             class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition">
+                        <option value="未定">未定</option>
+                        <option value="車">車</option>
+                        <option value="電車・バス">電車・バス</option>
+                        <option value="その他">その他</option>
+                      </select>
+                    </div>
+                  </div>
                   <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ t('remarks_label') }}</label>
                     <textarea v-model="guestForm.remarks" rows="3" :placeholder="t('remarks_placeholder')"
@@ -641,6 +679,8 @@ const guestForm = useForm({
     email: '',
     phone: '',
     remarks: '',
+    check_in_time: '未定',
+    transportation: '未定',
 });
 
 const selectRoom = async (room) => {
@@ -756,6 +796,8 @@ const saveReservation = async (paymentIntentId) => {
             guest_email: guestForm.email,
             guest_phone: guestForm.phone,
             guest_remarks: guestForm.remarks,
+            check_in_time: guestForm.check_in_time,
+            transportation: guestForm.transportation,
             total_amount: selectedRoom.value.total_amount,
         });
 

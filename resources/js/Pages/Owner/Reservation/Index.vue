@@ -56,6 +56,8 @@ const registerForm = useForm({
     guest_phone: '',
     guest_remarks: '',
     owner_memo: '',
+    check_in_time: '未定',
+    transportation: '未定',
 });
 
 const { t, isEn } = useI18n();
@@ -459,7 +461,7 @@ const executeCancel = () => {
                   </div>
                   <!-- 大人カウンター -->
                   <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-2">大人 *</label>
+                    <label class="block text-xs font-bold text-slate-500 mb-2">大人</label>
                     <div class="flex items-center gap-3">
                       <button type="button" @click="registerForm.number_of_adults = Math.max(1, registerForm.number_of_adults - 1)"
                               class="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition disabled:opacity-30"
@@ -513,7 +515,7 @@ const executeCancel = () => {
                     </div>
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-2">ゲスト名 *</label>
+                    <label class="block text-xs font-bold text-slate-500 mb-2">ゲスト名</label>
                     <input type="text" v-model="registerForm.guest_name" required class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition" />
                   </div>
                   <div>
@@ -522,9 +524,43 @@ const executeCancel = () => {
                     <p v-if="registerForm.errors.guest_email" class="mt-1 text-xs text-red-500">{{ registerForm.errors.guest_email }}</p>
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-2">電話番号 *</label>
+                    <label class="block text-xs font-bold text-slate-500 mb-2">電話番号</label>
                     <input type="tel" v-model="registerForm.guest_phone" required class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition" :class="{'border-red-500': registerForm.errors.guest_phone}" />
                     <p v-if="registerForm.errors.guest_phone" class="mt-1 text-xs text-red-500">{{ registerForm.errors.guest_phone }}</p>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-2">{{ t('arrival_time_label') }}</label>
+                    <select v-model="registerForm.check_in_time" required class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition">
+                      <option value="未定">未定</option>
+                      <option value="15:00">15:00</option>
+                      <option value="15:30">15:30</option>
+                      <option value="16:00">16:00</option>
+                      <option value="16:30">16:30</option>
+                      <option value="17:00">17:00</option>
+                      <option value="17:30">17:30</option>
+                      <option value="18:00">18:00</option>
+                      <option value="18:30">18:30</option>
+                      <option value="19:00">19:00</option>
+                      <option value="19:30">19:30</option>
+                      <option value="20:00">20:00</option>
+                      <option value="20:30">20:30</option>
+                      <option value="21:00">21:00</option>
+                      <option value="21:30">21:30</option>
+                      <option value="22:00">22:00</option>
+                      <option value="22:30">22:30</option>
+                      <option value="23:00">23:00</option>
+                      <option value="23:30">23:30</option>
+                      <option value="00:00">00:00</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-2">{{ t('transportation_label') }}</label>
+                    <select v-model="registerForm.transportation" required class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition">
+                      <option value="未定">未定</option>
+                      <option value="車">車</option>
+                      <option value="電車・バス">電車・バス</option>
+                      <option value="その他">その他</option>
+                    </select>
                   </div>
                   <div class="sm:col-span-2">
                     <label class="block text-xs font-bold text-slate-500 mb-2">ゲスト備考（お客様へのメッセージ／メールに表示されます）</label>
@@ -567,6 +603,26 @@ const executeCancel = () => {
                               <template v-if="registerForm.number_of_child_a > 0"> / {{ selectedRoomForRegister?.child_a_label || '子供A' }} {{ registerForm.number_of_child_a }}名</template>
                               <template v-if="registerForm.number_of_child_b > 0"> / {{ selectedRoomForRegister?.child_b_label || '子供B' }} {{ registerForm.number_of_child_b }}名</template>
                             </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 py-4 border-b border-slate-200">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">ゲスト名</p>
+                            <p class="font-bold text-slate-800">{{ registerForm.guest_name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">連絡先</p>
+                            <p class="text-sm text-slate-800">{{ registerForm.guest_email || '(メール未入力)' }}</p>
+                            <p class="text-sm text-slate-800">{{ registerForm.guest_phone }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">到着予定時刻</p>
+                            <p class="font-bold text-slate-800">{{ registerForm.check_in_time }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">交通手段</p>
+                            <p class="font-bold text-slate-800">{{ registerForm.transportation }}</p>
                         </div>
                     </div>
 
