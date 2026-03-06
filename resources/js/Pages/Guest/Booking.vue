@@ -763,6 +763,11 @@ const saveReservation = async (paymentIntentId) => {
             isReserved.value = true;
             clientSecret.value = '';
             hasAgreedToTerms.value = false;
+            
+            // 予約完了時に最上部へスクロール (PCのみ)
+            if (window.innerWidth >= 768) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
     } catch (error) {
         paymentError.value = t('reservation_save_error');
