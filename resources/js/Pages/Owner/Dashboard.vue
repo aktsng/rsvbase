@@ -386,8 +386,8 @@
                     <input type="text" v-model="registerForm.guest_name" required class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition" />
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-2">メール *</label>
-                    <input type="email" v-model="registerForm.guest_email" required class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition" :class="{'border-red-500': registerForm.errors.guest_email}" />
+                    <label class="block text-xs font-bold text-slate-500 mb-2">メール</label>
+                    <input type="email" v-model="registerForm.guest_email" class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition" :class="{'border-red-500': registerForm.errors.guest_email}" />
                     <p v-if="registerForm.errors.guest_email" class="mt-1 text-xs text-red-500">{{ registerForm.errors.guest_email }}</p>
                   </div>
                   <div>
@@ -493,7 +493,8 @@
                 </div>
 
                 <div v-if="$page.props.auth.is_stripe_connected" class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 text-[11px] text-emerald-700 leading-normal text-center">
-                    現地決済として登録されます。予約確定メールがゲストに送信されます。
+                    現地決済として登録されます。<template v-if="registerForm.guest_email">予約確定メールがゲストに送信されます。</template>
+                    <template v-else>メールアドレスが未入力のため、メールは送信されません。</template>
                 </div>
                 <div v-else class="bg-amber-50 p-4 rounded-2xl border border-amber-100 text-[11px] text-amber-700 leading-normal text-center">
                     現地決済として登録されます。プレビューモード中のため、メールは送信されません。

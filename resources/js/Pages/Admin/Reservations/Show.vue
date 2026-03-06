@@ -59,7 +59,7 @@
             </div>
             <div class="grid grid-cols-3">
               <dt class="text-slate-500">メールアドレス</dt>
-              <dd class="col-span-2 text-slate-900">{{ reservation.guest_email }}</dd>
+              <dd class="col-span-2 text-slate-900">{{ reservation.guest_email || '-' }}</dd>
             </div>
             <div class="grid grid-cols-3">
               <dt class="text-slate-500">電話番号</dt>

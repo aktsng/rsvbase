@@ -114,7 +114,7 @@ const executeCancel = () => {
                 </div>
                 <div>
                   <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">メールアドレス</dt>
-                  <dd class="text-slate-900">{{ props.reservation.guest_email }}</dd>
+                  <dd class="text-slate-900">{{ props.reservation.guest_email || '-' }}</dd>
                 </div>
                 <div>
                   <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">電話番号</dt>

@@ -264,15 +264,17 @@ class ReservationController extends Controller
         // キャンセル（返金）メール送信のディスパッチ（Stripe連携済みの場合のみ）
         if ($request->user()->stripe_account_status === 'complete') {
             try {
-                if ($reservation->payment_method === 'onsite') {
-                    \Illuminate\Support\Facades\Mail::to($reservation->guest_email)
-                        ->send(new \App\Mail\ReservationCancelled($reservation));
-                } elseif ($refundAmount > 0) {
-                    \Illuminate\Support\Facades\Mail::to($reservation->guest_email)
-                        ->send(new \App\Mail\ReservationRefunded($reservation));
-                } else {
-                    \Illuminate\Support\Facades\Mail::to($reservation->guest_email)
-                        ->send(new \App\Mail\ReservationCancelled($reservation));
+                if ($reservation->guest_email) {
+                    if ($reservation->payment_method === 'onsite') {
+                        \Illuminate\Support\Facades\Mail::to($reservation->guest_email)
+                            ->send(new \App\Mail\ReservationCancelled($reservation));
+                    } elseif ($refundAmount > 0) {
+                        \Illuminate\Support\Facades\Mail::to($reservation->guest_email)
+                            ->send(new \App\Mail\ReservationRefunded($reservation));
+                    } else {
+                        \Illuminate\Support\Facades\Mail::to($reservation->guest_email)
+                            ->send(new \App\Mail\ReservationCancelled($reservation));
+                    }
                 }
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error('Cancel Email Error: ' . $e->getMessage());
@@ -302,7 +304,7 @@ class ReservationController extends Controller
             'number_of_child_a' => ['nullable', 'integer', 'min:0'],
             'number_of_child_b' => ['nullable', 'integer', 'min:0'],
             'guest_name' => ['required', 'string', 'max:255'],
-            'guest_email' => ['required', 'email', 'max:255'],
+            'guest_email' => ['nullable', 'email', 'max:255'],
             'guest_phone' => ['required', 'string', 'max:50'],
             'guest_remarks' => ['nullable', 'string', 'max:1000'],
             'owner_memo' => ['nullable', 'string', 'max:5000'],
@@ -389,7 +391,9 @@ class ReservationController extends Controller
         // メール通知（Stripe連携済みの場合のみ送信）
         if ($request->user()->stripe_account_status === 'complete') {
             try {
-                Mail::to($reservation->guest_email)->send(new ReservationCompletedGuest($reservation));
+                if ($reservation->guest_email) {
+                    Mail::to($reservation->guest_email)->send(new ReservationCompletedGuest($reservation));
+                }
                 Mail::to($facility->owner->email)->send(new ReservationCompletedOwner($reservation));
             } catch (\Exception $e) {
                 Log::error('Manual Reservation Email Error: ' . $e->getMessage());
