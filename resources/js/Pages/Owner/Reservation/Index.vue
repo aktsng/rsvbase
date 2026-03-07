@@ -42,6 +42,25 @@ const tomorrow = new Date();
 tomorrow.setDate(tomorrow.getDate() + 1);
 const tomorrowStr = formatDateHelper(tomorrow);
 
+const formatDateWithDay = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const day = days[date.getDay()];
+    return `${y}/${m}/${d}(${day})`;
+};
+
+const getNightsCount = (checkIn, checkOut) => {
+    if (!checkIn || !checkOut) return 0;
+    const ci = new Date(checkIn);
+    const co = new Date(checkOut);
+    const diffTime = co - ci;
+    return Math.round(diffTime / (1000 * 60 * 60 * 24));
+};
+
 // 新規予約フォーム
 const registerForm = useForm({
     room_id: '',
@@ -289,6 +308,7 @@ const executeCancel = () => {
                 <th class="px-6 py-4 min-w-[150px]">予約番号 / 日時</th>
                 <th class="px-6 py-4 min-w-[120px]">ゲスト名</th>
                 <th class="px-6 py-4 min-w-[200px]">宿泊内容</th>
+                <th class="px-6 py-4 min-w-[80px]">泊数</th>
                 <th class="px-6 py-4 text-right min-w-[100px]">料金</th>
                 <th class="px-6 py-4 min-w-[100px]">ステータス</th>
                 <th class="px-6 py-4 text-center min-w-[150px]">操作</th>
@@ -306,10 +326,13 @@ const executeCancel = () => {
                 </td>
                 <td class="px-6 py-4">
                   <div class="font-medium text-primary-900">{{ res.room_name }}</div>
-                  <div class="text-xs text-slate-500 mt-1 whitespace-nowrap">{{ res.check_in_date }} 〜 {{ res.check_out_date }}</div>
+                  <div class="text-xs text-slate-500 mt-1 whitespace-nowrap">{{ formatDateWithDay(res.check_in_date) }} 〜 {{ formatDateWithDay(res.check_out_date) }}</div>
                   <div v-if="res.guest_remarks" class="text-[10px] text-slate-400 mt-1 line-clamp-1 italic" :title="res.guest_remarks">
                     備考: {{ res.guest_remarks }}
                   </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="font-bold text-slate-700">{{ getNightsCount(res.check_in_date, res.check_out_date) }}泊</div>
                 </td>
                 <td class="px-6 py-4 text-right">
                   <div class="font-bold text-slate-800">¥{{ (Number(res.total_amount) || 0).toLocaleString() }}</div>
@@ -594,7 +617,7 @@ const executeCancel = () => {
                     <div class="flex justify-between items-start border-b border-slate-200 pb-4">
                         <div>
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">宿泊期間</p>
-                            <p class="font-bold text-slate-800">{{ registerForm.check_in_date }} 〜 {{ registerForm.check_out_date }}</p>
+                            <p class="font-bold text-slate-800">{{ formatDateWithDay(registerForm.check_in_date) }} 〜 {{ formatDateWithDay(registerForm.check_out_date) }}</p>
                         </div>
                         <div class="text-right">
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">人数</p>
