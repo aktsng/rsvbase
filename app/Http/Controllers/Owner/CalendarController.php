@@ -45,19 +45,43 @@ class CalendarController extends Controller
         for ($date = $startOfMonth->copy(); $date->lte($endOfMonth); $date->addDay()) {
             $dateStr = $date->toDateString();
 
-            // 予約されているか判定（チェックイン日〜チェックアウト前日までを「宿泊日」として予約ありとする）
-            $reserved = $reservations->contains(function ($res) use ($date, $dateStr) {
+            // 該当日の予約を見つける
+            $resAtDate = $reservations->first(function ($res) use ($dateStr) {
                 return $dateStr >= $res->check_in_date->toDateString() && $dateStr < $res->check_out_date->toDateString();
             });
 
-            $days[] = [
+            $dayData = [
                 'date' => $dateStr,
                 'day_number' => $date->day,
                 'is_today' => $date->isToday(),
-                'is_past' => $date->isPast() && !$date->isToday(), // 今日以前は編集不可にするため
-                'is_reserved' => $reserved,
+                'is_past' => $date->isPast() && !$date->isToday(),
+                'is_reserved' => (bool) $resAtDate,
                 'is_blocked' => $blocks->has($dateStr),
             ];
+
+            if ($resAtDate) {
+                // 時刻の影響を排除して宿泊数を計算
+                $checkIn = Carbon::parse($resAtDate->check_in_date->toDateString());
+                $checkOut = Carbon::parse($resAtDate->check_out_date->toDateString());
+                $currentDate = Carbon::parse($dateStr);
+
+                $nights = (int) $checkIn->diffInDays($checkOut);
+                $dayDiff = (int) $checkIn->diffInDays($currentDate);
+
+                $dayData['reservation_day_number'] = $dayDiff + 1;
+
+                if ($nights === 1) {
+                    $dayData['reservation_position'] = 'single';
+                } elseif ($currentDate->isSameDay($checkIn)) {
+                    $dayData['reservation_position'] = 'start';
+                } elseif ($currentDate->copy()->addDay()->isSameDay($checkOut)) {
+                    $dayData['reservation_position'] = 'end';
+                } else {
+                    $dayData['reservation_position'] = 'middle';
+                }
+            }
+
+            $days[] = $dayData;
         }
 
         return Inertia::render('Owner/Room/Calendar/Index', [

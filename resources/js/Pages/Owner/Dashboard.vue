@@ -104,9 +104,9 @@
 
     <!-- 予約状況カレンダー -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-8">
-      <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+      <div class="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h2 class="text-lg font-bold text-slate-800">予約状況カレンダー</h2>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
           <div class="flex items-center bg-slate-100 rounded-xl p-1">
             <Link :href="route('owner.dashboard', { month: calendar.prevMonth })" 
                   preserve-scroll
@@ -115,7 +115,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
               </svg>
             </Link>
-            <span class="px-4 text-sm font-bold text-slate-700 min-w-[100px] text-center">
+            <span class="px-4 text-xs sm:text-sm font-bold text-slate-700 min-w-[80px] sm:min-w-[100px] text-center">
               {{ formatMonth(calendar.currentMonth) }}
             </span>
             <Link :href="route('owner.dashboard', { month: calendar.nextMonth })"
@@ -126,8 +126,8 @@
               </svg>
             </Link>
           </div>
-          <Link :href="route('owner.dashboard')" preserve-scroll class="text-xs font-bold text-primary-600 hover:text-primary-700">
-            当月に戻る
+          <Link :href="route('owner.dashboard')" preserve-scroll class="px-3 py-2 bg-slate-50 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-100 transition whitespace-nowrap">
+            当月
           </Link>
         </div>
       </div>
@@ -136,7 +136,7 @@
         <table class="w-full border-collapse border border-slate-100">
           <thead>
             <tr>
-              <th class="sticky left-0 z-10 bg-slate-50 border border-slate-100 px-4 py-2 text-left text-xs font-bold text-slate-500 w-32 min-w-[128px] shrink-0">
+              <th class="sticky left-0 z-20 bg-slate-50 border border-slate-100 px-4 py-2 text-left text-xs font-bold text-slate-500 w-32 min-w-[128px] shrink-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                 部屋名
               </th>
               <th v-for="day in calendar.days" :key="day.date" 
@@ -157,7 +157,7 @@
           </thead>
           <tbody>
             <tr v-for="room in calendar.rooms" :key="room.uuid">
-              <td class="sticky left-0 z-10 bg-white border border-slate-100 px-4 py-3 text-sm font-bold text-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-32 min-w-[128px] break-all">
+              <td class="sticky left-0 z-20 bg-white border border-slate-100 px-4 py-3 text-sm font-bold text-slate-700 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-32 min-w-[128px] break-all">
                 {{ room.name }}
               </td>
               <td v-for="day in calendar.days" :key="day.date" 
@@ -262,6 +262,7 @@
               <th class="px-6 py-3 min-w-[120px]">部屋</th>
               <th class="px-6 py-3 min-w-[120px]">チェックイン</th>
               <th class="px-6 py-3 text-right min-w-[100px]">料金</th>
+              <th class="px-6 py-3 text-center min-w-[80px]">操作</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
@@ -275,9 +276,15 @@
               <td class="px-6 py-4">{{ reservation.room_name }}</td>
               <td class="px-6 py-4">{{ reservation.check_in_date }}</td>
               <td class="px-6 py-4 text-right font-medium text-slate-800">¥{{ reservation.total_amount.toLocaleString() }}</td>
+              <td class="px-6 py-4 text-center">
+                <Link :href="route('owner.reservations.show', reservation.uuid)" 
+                      class="inline-flex items-center px-3 py-1 bg-white border border-slate-200 text-xs font-bold text-slate-600 rounded-lg hover:bg-slate-50 hover:text-primary-600 hover:border-primary-200 transition">
+                  詳細
+                </Link>
+              </td>
             </tr>
             <tr v-if="recentReservations.length === 0">
-              <td colspan="5" class="px-6 py-8 text-center text-slate-500">
+              <td colspan="6" class="px-6 py-8 text-center text-slate-500">
                 最近の予約はありません。
               </td>
             </tr>

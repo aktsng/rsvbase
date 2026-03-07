@@ -29,18 +29,18 @@
           <table class="w-full text-left text-sm text-slate-600">
             <thead class="bg-slate-50 text-slate-500 font-medium">
               <tr>
-                <th class="px-6 py-4">部屋名</th>
-                <th class="px-6 py-4">定員</th>
-                <th class="px-6 py-4">基本料金</th>
-                <th class="px-6 py-4">清掃費</th>
-                <th class="px-6 py-4">ステータス</th>
-                <th class="px-6 py-4 text-right">操作</th>
+                <th class="sticky left-0 z-20 bg-slate-50 px-6 py-4 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">部屋名</th>
+                <th class="px-6 py-4 min-w-[80px]">定員</th>
+                <th class="px-6 py-4 min-w-[120px]">基本料金</th>
+                <th class="px-6 py-4 min-w-[100px]">清掃費</th>
+                <th class="px-6 py-4 min-w-[100px]">ステータス</th>
+                <th class="px-6 py-4 text-right min-w-[200px]">操作</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="room in rooms" :key="room.uuid" class="hover:bg-slate-50 transition">
-                <td class="px-6 py-4">
-                  <div class="font-bold text-slate-800">{{ room.name }}</div>
+                <td class="sticky left-0 z-10 bg-white px-6 py-4 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                  <div class="font-bold text-slate-800 whitespace-nowrap">{{ room.name }}</div>
                 </td>
                 <td class="px-6 py-4">{{ room.capacity }} 名</td>
                 <td class="px-6 py-4 text-slate-800 font-medium">¥{{ room.base_price_per_night.toLocaleString() }}</td>

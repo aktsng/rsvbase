@@ -60,7 +60,10 @@ class DashboardController extends Controller
         foreach ($rooms as $room) {
             $mappedRes = [];
             foreach ($allReservations->where('room_id', $room->id) as $res) {
-                $nights = $res->check_in_date->diffInDays($res->check_out_date);
+                // 時刻の影響を排除して宿泊数を計算
+                $checkIn = \Carbon\Carbon::parse($res->check_in_date->toDateString());
+                $checkOut = \Carbon\Carbon::parse($res->check_out_date->toDateString());
+                $nights = (int) $checkIn->diffInDays($checkOut);
 
                 // チェックインからチェックアウト前日までを「予約あり」とする
                 $dayNumber = 1;
