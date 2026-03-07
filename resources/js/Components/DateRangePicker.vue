@@ -109,6 +109,7 @@ const props = defineProps({
   checkInLabel: { type: String, default: '' },
   checkOutLabel: { type: String, default: '' },
   nightsLabel: { type: String, default: '' },
+  allowSameDay: { type: Boolean, default: false },
   availability: {
     type: Object,
     default: () => ({}),
@@ -231,12 +232,14 @@ const calendarCells = computed(() => {
     } else {
       // チェックアウト選択時
       const ci = props.modelValue.checkIn;
-      if (dateStr <= ci) {
-        // チェックイン日以前は不可
+      if (dateStr < ci) {
+        // チェックイン日より前の日付は不可
+        isDisabled = true;
+      } else if (dateStr === ci && !props.allowSameDay) {
+        // 通常の宿泊予約は同日チェックアウト不可
         isDisabled = true;
       } else if (firstReservedDateAfterCheckIn.value) {
         // 途中に予約がある場合、その予約開始日より後のチェックアウトは不可
-        // (例: 5日が予約済みなら、5日チェックアウトはOKだが6日以降はNG)
         isDisabled = dateStr > firstReservedDateAfterCheckIn.value;
       }
     }
@@ -265,11 +268,14 @@ const selectDate = (dateStr) => {
     isSelectingCheckIn.value = false;
   } else {
     // チェックアウト選択
-    if (dateStr <= props.modelValue.checkIn) {
+    if (dateStr < props.modelValue.checkIn) {
       // チェックイン以前の日付→チェックインをリセット
       if (props.availability[dateStr]) return;
       emit('update:modelValue', { checkIn: dateStr, checkOut: null });
       isSelectingCheckIn.value = false;
+    } else if (dateStr === props.modelValue.checkIn && !props.allowSameDay) {
+      // 同一日の選択（宿泊予約の場合）→何もしない、または再選択
+      return;
     } else {
       // 範囲内に予約・ブロックがあるかチェック
       const ci = props.modelValue.checkIn;

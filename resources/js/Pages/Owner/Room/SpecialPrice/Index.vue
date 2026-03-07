@@ -32,17 +32,14 @@
                 <p v-if="form.errors.label" class="mt-1 text-sm text-red-500">{{ form.errors.label }}</p>
               </div>
 
-              <div class="space-y-4">
-                <div>
-                  <label for="start_date" class="block text-sm font-medium text-slate-700 mb-1">開始日 <span class="text-red-500">*</span></label>
-                  <input id="start_date" v-model="form.start_date" type="date" required
-                         class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition">
-                </div>
-                <div>
-                  <label for="end_date" class="block text-sm font-medium text-slate-700 mb-1">終了日 <span class="text-red-500">*</span></label>
-                  <input id="end_date" v-model="form.end_date" type="date" required
-                         class="block w-full px-4 py-2 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition">
-                </div>
+              <div class="space-y-4 pt-2 pb-2">
+                <DateRangePicker
+                  v-model="dateRange"
+                  check-in-label="開始日"
+                  check-out-label="終了日"
+                  nights-label="日間"
+                  :allow-same-day="true"
+                />
                 <p v-if="form.errors.start_date || form.errors.end_date" class="mt-1 text-sm text-red-500">期間が正しくありません</p>
               </div>
 
@@ -93,18 +90,18 @@
             
             <div class="overflow-x-auto">
               <table class="w-full text-left text-sm text-slate-600">
-                <thead class="bg-slate-50 text-slate-500 font-medium">
+                <thead class="bg-slate-50 text-slate-500 font-medium whitespace-nowrap">
                   <tr>
-                    <th class="px-6 py-3">期間</th>
-                    <th class="px-6 py-3">ラベル</th>
-                    <th class="px-6 py-3">1泊料金</th>
+                    <th class="px-6 py-3 min-w-[150px]">期間</th>
+                    <th class="px-6 py-3 min-w-[150px]">ラベル</th>
+                    <th class="px-6 py-3 min-w-[100px]">1泊料金</th>
                     <th class="px-6 py-3 text-right">操作</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                   <tr v-for="sp in specialPrices" :key="sp.id" class="hover:bg-slate-50 transition">
                     <td class="px-6 py-4 font-medium text-slate-800 whitespace-nowrap">
-                      {{ sp.start_date }} <span class="text-slate-400 font-normal">〜</span> {{ sp.end_date }}
+                      {{ formatDateWithDay(sp.start_date) }} <span class="text-slate-400 font-normal">〜</span> {{ formatDateWithDay(sp.end_date) }}
                     </td>
                     <td class="px-6 py-4">
                       <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">
@@ -114,7 +111,7 @@
                     <td class="px-6 py-4 text-slate-800 font-medium whitespace-nowrap">
                       ¥{{ sp.price_per_night.toLocaleString() }}
                     </td>
-                    <td class="px-6 py-4 text-right">
+                    <td class="px-6 py-4 text-right whitespace-nowrap">
                       <button @click="confirmDelete(sp.id)" class="text-red-500 hover:text-red-700 font-medium text-sm transition">
                         削除
                       </button>
@@ -129,6 +126,13 @@
                 </tbody>
               </table>
             </div>
+            <!-- スクロールヒント -->
+            <div class="px-4 pb-4 text-center text-[10px] text-slate-400 font-medium lg:hidden flex justify-center items-center gap-1.5 opacity-60">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+              <span>横にスクロールしてご確認いただけます</span>
+            </div>
           </div>
         </div>
       </div>
@@ -137,8 +141,10 @@
 </template>
 
 <script setup>
+import { ref, watch } from 'vue';
 import { Head, useForm, Link, router } from '@inertiajs/vue3';
 import OwnerLayout from '@/Layouts/OwnerLayout.vue';
+import DateRangePicker from '@/Components/DateRangePicker.vue';
 
 const props = defineProps({
     room: Object,
@@ -152,10 +158,34 @@ const form = useForm({
     label: '',
 });
 
+const dateRange = ref({
+    checkIn: '',
+    checkOut: '',
+});
+
+watch(dateRange, (newVal) => {
+    form.start_date = newVal.checkIn;
+    form.end_date = newVal.checkOut;
+}, { deep: true });
+
 const submit = () => {
     form.post(route('owner.rooms.special-prices.store', props.room.uuid), {
-        onSuccess: () => form.reset(),
+        onSuccess: () => {
+            form.reset();
+            dateRange.value = { checkIn: '', checkOut: '' };
+        },
     });
+};
+
+const formatDateWithDay = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const day = days[date.getDay()];
+    return `${y}/${m}/${d}(${day})`;
 };
 
 const confirmDelete = (id) => {
