@@ -4,6 +4,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @if (app()->isProduction())
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-EBD1C0WD7T"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+
+            gtag('config', 'G-EBD1C0WD7T');
+        </script>
+    @endif
     <meta name="description" content="RsvBase - 小規模宿泊施設向け直販予約システム">
 
     <title inertia>{{ config('app.name', 'RsvBase') }}</title>
