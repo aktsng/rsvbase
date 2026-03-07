@@ -21,9 +21,21 @@
         <RsvLogo className="w-8 h-8" />
         <span class="text-lg font-bold text-slate-800">RsvBase</span>
       </div>
-      <nav class="p-4 space-y-1">
-        <slot name="sidebar" />
-      </nav>
+      <div class="flex flex-col h-[calc(100%-80px)]">
+        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+          <slot name="sidebar" />
+        </nav>
+
+        <div class="p-4 border-t border-slate-100">
+          <Link :href="route('logout')" method="post" as="button"
+                class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-red-50 hover:text-red-600 transition-all duration-150">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span>ログアウト</span>
+          </Link>
+        </div>
+      </div>
     </aside>
 
     <!-- メインコンテンツ -->
@@ -42,10 +54,7 @@
             </h1>
           </div>
           <div class="flex items-center gap-4">
-            <Link :href="route('logout')" method="post" as="button"
-                  class="text-sm text-slate-500 hover:text-slate-700 transition">
-              ログアウト
-            </Link>
+            <!-- ログアウトはサイドバーに移動 -->
           </div>
         </div>
       </header>
