@@ -200,24 +200,51 @@ const steps = [
             </section>
 
             <!-- Pain Points section -->
-            <section class="py-20 bg-slate-50 overflow-hidden">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <section class="py-24 bg-white overflow-hidden relative">
+                <!-- 背景の柔らかな装飾 -->
+                <div class="absolute top-0 left-1/4 w-96 h-96 bg-orange-50 rounded-full blur-[100px] opacity-50 -z-10"></div>
+                <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-50 rounded-full blur-[100px] opacity-50 -z-10"></div>
+
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div class="max-w-3xl mx-auto text-center mb-16 reveal">
-                        <span class="text-teal-600 font-bold uppercase tracking-widest text-xs">COMMISERATION</span>
-                        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2">こんなお悩み、ありませんか？</h2>
+                        <span class="text-orange-600 font-bold uppercase tracking-[0.2em] text-xs px-4 py-1.5 bg-orange-50 rounded-full">COMMISERATION</span>
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 mt-6 mb-4">こんなお悩み、ありませんか？</h2>
+                        <p class="text-slate-500 font-medium">理想の宿運営を妨げる、日々の「小さくて重い」負担。</p>
                     </div>
-                    <div class="grid md:grid-cols-3 gap-8">
+
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16">
                         <div v-for="(pain, i) in [
-                            '夜中のDM対応で、自分の睡眠時間やプライベートが削られている。',
-                            'DMでの予約は、ドタキャン（NoShow）された時に泣き寝入りするしかない。',
-                            '大手予約サイトは手数料が高く、管理画面も複雑すぎて使いこなせない。'
-                        ]" :key="i" class="bg-white p-8 rounded-3xl shadow-sm ring-1 ring-slate-900/5 reveal" :style="{ transitionDelay: `${i * 150}ms` }">
-                            <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center mb-6">
-                                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                            { 
+                                title: 'TIME LOSS', 
+                                subtitle: '24時間止まらない通知', 
+                                description: '夜中のDM対応で、自分の睡眠時間やプライベートが削られている。',
+                                icon: 'M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z'
+                            },
+                            { 
+                                title: 'NOSHOW RISK', 
+                                subtitle: '回収不能な機会損失', 
+                                description: 'DMでの予約は、ドタキャン（NoShow）された時に泣き寝入りするしかない。',
+                                icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
+                            },
+                            { 
+                                title: 'HIGH COSTS', 
+                                subtitle: '削られる利益と過剰な機能', 
+                                description: '大手予約サイトは手数料が高く、管理画面も複雑すぎて使いこなせない。',
+                                icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                            }
+                        ]" :key="i" class="flex gap-6 reveal" :style="{ transitionDelay: `${i * 150}ms` }">
+                            <div class="flex-shrink-0">
+                                <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center ring-1 ring-orange-100">
+                                    <svg class="w-7 h-7 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="pain.icon" />
+                                    </svg>
+                                </div>
                             </div>
-                            <p class="text-lg font-medium text-slate-800 leading-relaxed">{{ pain }}</p>
+                            <div>
+                                <h3 class="text-orange-700 font-bold text-sm mb-1 uppercase tracking-wider">{{ pain.title }}</h3>
+                                <h4 class="text-xl font-bold text-slate-900 mb-3">{{ pain.subtitle }}</h4>
+                                <p class="text-slate-600 leading-relaxed">{{ pain.description }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
