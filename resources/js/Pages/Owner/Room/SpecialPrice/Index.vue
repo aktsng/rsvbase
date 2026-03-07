@@ -2,12 +2,15 @@
   <OwnerLayout>
     <Head title="特定日料金設定" />
     <template #header>
-      <div class="flex items-center gap-2">
-        <Link :href="route('owner.rooms.index')" class="text-slate-400 hover:text-slate-600 transition">部屋一覧</Link>
-        <span class="text-slate-300">/</span>
-        <Link :href="route('owner.rooms.edit', room.uuid)" class="text-slate-400 hover:text-slate-600 transition">{{ room.name }}</Link>
-        <span class="text-slate-300">/</span>
-        <span>特定日料金</span>
+      <div class="flex items-center gap-1.5 text-sm sm:text-base font-medium overflow-hidden whitespace-nowrap flex-nowrap">
+        <Link :href="route('owner.rooms.index')" class="text-slate-400 hover:text-slate-600 transition shrink-0">部屋一覧</Link>
+        <span class="text-slate-300 shrink-0">/</span>
+        <Link :href="route('owner.rooms.edit', room.uuid)" 
+              class="text-slate-400 hover:text-slate-600 transition truncate max-w-[80px] sm:max-w-none">
+          {{ room.name }}
+        </Link>
+        <span class="text-slate-300 shrink-0">/</span>
+        <span class="text-slate-800 shrink-0">特定料金</span>
       </div>
     </template>
 

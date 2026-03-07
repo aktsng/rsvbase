@@ -49,10 +49,21 @@
                   <span v-if="room.is_active" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 shrink-0">公開</span>
                   <span v-else class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800 shrink-0">非公開</span>
                 </td>
-                <td class="px-6 py-4 text-right space-x-3">
-                  <Link :href="route('owner.rooms.calendar', room.uuid)" class="text-primary-600 hover:text-primary-900 font-medium text-sm">カレンダー</Link>
-                  <Link :href="route('owner.rooms.special-prices.index', room.uuid)" class="text-primary-600 hover:text-primary-900 font-medium text-sm">特定日料金</Link>
-                  <Link :href="route('owner.rooms.edit', room.uuid)" class="text-slate-500 hover:text-slate-800 font-medium text-sm">編集</Link>
+                <td class="px-6 py-4 text-right">
+                  <div class="flex items-center justify-end gap-2 sm:gap-4">
+                    <Link :href="route('owner.rooms.calendar', room.uuid)" 
+                          class="inline-flex items-center justify-center p-2 sm:p-0 bg-primary-50 sm:bg-transparent text-primary-600 hover:text-primary-900 rounded-lg sm:rounded-none transition-colors group">
+                      <span class="text-[10px] sm:text-sm font-bold leading-tight sm:leading-normal text-center w-5 sm:w-auto">空室管理</span>
+                    </Link>
+                    <Link :href="route('owner.rooms.special-prices.index', room.uuid)" 
+                          class="inline-flex items-center justify-center p-2 sm:p-0 bg-primary-50 sm:bg-transparent text-primary-600 hover:text-primary-900 rounded-lg sm:rounded-none transition-colors group">
+                      <span class="text-[10px] sm:text-sm font-bold leading-tight sm:leading-normal text-center w-5 sm:w-auto">特定料金</span>
+                    </Link>
+                    <Link :href="route('owner.rooms.edit', room.uuid)" 
+                          class="inline-flex items-center justify-center p-2 sm:p-0 bg-slate-50 sm:bg-transparent text-slate-500 hover:text-slate-800 rounded-lg sm:rounded-none transition-colors group">
+                      <span class="text-[10px] sm:text-sm font-bold leading-tight sm:leading-normal text-center w-5 sm:w-auto">編集</span>
+                    </Link>
+                  </div>
                 </td>
               </tr>
               <tr v-if="rooms.length === 0">
@@ -66,6 +77,12 @@
               </tr>
             </tbody>
           </table>
+        </div>
+        <div class="px-4 pb-4 text-center text-[10px] text-slate-400 font-medium lg:hidden flex justify-center items-center gap-1.5 opacity-60">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+          <span>横にスクロールしてご確認いただけます</span>
         </div>
       </div>
     </div>
