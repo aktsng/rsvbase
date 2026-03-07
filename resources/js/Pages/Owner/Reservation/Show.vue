@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import OwnerLayout from '@/Layouts/OwnerLayout.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 const props = defineProps({
     reservation: Object,
@@ -10,6 +10,11 @@ const props = defineProps({
 
 const memoForm = useForm({
     owner_memo: props.reservation?.owner_memo || '',
+});
+
+// サーバー側でオーナーメモが更新されたら同期する
+watch(() => props.reservation?.owner_memo, (newMemo) => {
+    memoForm.owner_memo = newMemo || '';
 });
 
 const saveMemo = () => {
@@ -70,6 +75,42 @@ const executeCancel = () => {
         }
     });
 };
+
+// 編集モーダル制御
+const showEditModal = ref(false);
+const editForm = useForm({
+    guest_name: props.reservation?.guest_name || '',
+    guest_email: props.reservation?.guest_email || '',
+    guest_phone: props.reservation?.guest_phone || '',
+    number_of_adults: props.reservation?.number_of_adults || 1,
+    number_of_child_a: props.reservation?.number_of_child_a || 0,
+    number_of_child_b: props.reservation?.number_of_child_b || 0,
+    check_in_time: props.reservation?.check_in_time || '未定',
+    transportation: props.reservation?.transportation || '未定',
+    remarks: '',
+});
+
+const openEditModal = () => {
+    editForm.guest_name = props.reservation?.guest_name || '';
+    editForm.guest_email = props.reservation?.guest_email || '';
+    editForm.guest_phone = props.reservation?.guest_phone || '';
+    editForm.number_of_adults = props.reservation?.number_of_adults || 1;
+    editForm.number_of_child_a = props.reservation?.number_of_child_a || 0;
+    editForm.number_of_child_b = props.reservation?.number_of_child_b || 0;
+    editForm.check_in_time = props.reservation?.check_in_time || '未定';
+    editForm.transportation = props.reservation?.transportation || '未定';
+    editForm.remarks = '';
+    showEditModal.value = true;
+};
+
+const updateReservation = () => {
+    editForm.put(route('owner.reservations.update', props.reservation?.uuid), {
+        onSuccess: () => {
+            showEditModal.value = false;
+        },
+        preserveScroll: true,
+    });
+};
 </script>
 
 <template>
@@ -95,15 +136,23 @@ const executeCancel = () => {
           
           <!-- 基本情報 -->
           <div v-if="props.reservation" class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
-              <h3 class="font-bold text-slate-800">予約・ゲスト情報</h3>
-              <div class="flex gap-2 items-center">
-                <span v-if="props.reservation.payment_method === 'stripe'" class="px-2 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase tracking-tighter">オンライン決済</span>
-                <span v-else-if="props.reservation.payment_method === 'onsite'" class="px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 uppercase tracking-tighter">現地決済</span>
-                
-                <span v-if="props.reservation.status === 'confirmed'" class="px-3 py-1 rounded-full text-xs font-bold bg-primary-100 text-primary-800">確定済み</span>
-                <span v-else-if="props.reservation.status === 'cancelled'" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500">取消</span>
-                <span v-else-if="props.reservation.status === 'refunded'" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">返金済み</span>
+            <div class="px-6 py-4 border-b border-slate-50 bg-slate-50/50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 text-slate-800">
+              <h3 class="font-bold whitespace-nowrap">予約・ゲスト情報</h3>
+              <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <button @click="openEditModal" class="px-3 py-1.5 bg-white border border-slate-200 text-xs font-bold text-primary-600 rounded-lg hover:bg-primary-50 hover:border-primary-100 transition flex items-center gap-1.5 shadow-sm">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  編集
+                </button>
+                <div class="flex flex-wrap gap-2 items-center">
+                  <span v-if="props.reservation.payment_method === 'stripe'" class="px-2 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase tracking-tighter whitespace-nowrap">オンライン決済</span>
+                  <span v-else-if="props.reservation.payment_method === 'onsite'" class="px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 uppercase tracking-tighter whitespace-nowrap">現地決済</span>
+                  
+                  <span v-if="props.reservation.status === 'confirmed'" class="px-3 py-1 rounded-full text-xs font-bold bg-primary-100 text-primary-800 whitespace-nowrap">確定済み</span>
+                  <span v-else-if="props.reservation.status === 'cancelled'" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500 whitespace-nowrap">取消</span>
+                  <span v-else-if="props.reservation.status === 'refunded'" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 whitespace-nowrap">返金済み</span>
+                </div>
               </div>
             </div>
             <div class="p-6">
@@ -418,6 +467,143 @@ const executeCancel = () => {
                       class="w-full inline-flex justify-center rounded-xl border border-slate-200 px-4 py-3 bg-white text-base font-medium text-slate-600 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm transition">
                 キャンセルせずに閉じる
               </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 予約内容編集モーダル -->
+    <div v-if="showEditModal" class="relative z-50">
+      <div class="fixed inset-0 bg-slate-900 bg-opacity-50 backdrop-blur-sm transition-opacity" @click="showEditModal = false"></div>
+      <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+          <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-xl border border-slate-100">
+            <div class="bg-white px-8 pt-8 pb-6">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-black text-slate-900 tracking-tight">予約内容の変更</h3>
+                <button @click="showEditModal = false" class="text-slate-400 hover:text-slate-600 transition p-2 hover:bg-slate-100 rounded-full">
+                  <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+
+              <form @submit.prevent="updateReservation" class="space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <!-- ゲスト情報 -->
+                  <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">ゲスト名 *</label>
+                    <input type="text" v-model="editForm.guest_name" required class="block w-full px-4 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 transition" />
+                    <p v-if="editForm.errors.guest_name" class="mt-1 text-xs text-red-500">{{ editForm.errors.guest_name }}</p>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">メールアドレス</label>
+                    <input type="email" v-model="editForm.guest_email" class="block w-full px-4 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 transition" />
+                    <p v-if="editForm.errors.guest_email" class="mt-1 text-xs text-red-500">{{ editForm.errors.guest_email }}</p>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">電話番号 *</label>
+                    <input type="tel" v-model="editForm.guest_phone" required class="block w-full px-4 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 transition" />
+                    <p v-if="editForm.errors.guest_phone" class="mt-1 text-xs text-red-500">{{ editForm.errors.guest_phone }}</p>
+                  </div>
+
+                  <!-- 人数セクション -->
+                  <div class="sm:col-span-2 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest">宿泊人数</label>
+                        <span class="text-[10px] text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded">※人数を変更しても料金は変わりません</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <!-- 大人カウンター -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 mb-2">大人</label>
+                            <div class="flex items-center gap-3">
+                                <button type="button" @click="editForm.number_of_adults = Math.max(1, editForm.number_of_adults - 1)"
+                                        class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition disabled:opacity-30"
+                                        :disabled="editForm.number_of_adults <= 1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                                </button>
+                                <span class="w-6 text-center font-bold text-slate-800">{{ editForm.number_of_adults }}</span>
+                                <button type="button" @click="editForm.number_of_adults++"
+                                        class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- 子供Aカウンター -->
+                        <div v-if="props.reservation.child_a_label">
+                            <label class="block text-[10px] font-bold text-slate-400 mb-2">{{ props.reservation.child_a_label }}</label>
+                            <div class="flex items-center gap-3">
+                                <button type="button" @click="editForm.number_of_child_a = Math.max(0, editForm.number_of_child_a - 1)"
+                                        class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition disabled:opacity-30"
+                                        :disabled="editForm.number_of_child_a <= 0">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                                </button>
+                                <span class="w-6 text-center font-bold text-slate-800">{{ editForm.number_of_child_a }}</span>
+                                <button type="button" @click="editForm.number_of_child_a++"
+                                        class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- 子供Bカウンター -->
+                        <div v-if="props.reservation.child_b_label">
+                            <label class="block text-[10px] font-bold text-slate-400 mb-2">{{ props.reservation.child_b_label }}</label>
+                            <div class="flex items-center gap-3">
+                                <button type="button" @click="editForm.number_of_child_b = Math.max(0, editForm.number_of_child_b - 1)"
+                                        class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition disabled:opacity-30"
+                                        :disabled="editForm.number_of_child_b <= 0">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                                </button>
+                                <span class="w-6 text-center font-bold text-slate-800">{{ editForm.number_of_child_b }}</span>
+                                <button type="button" @click="editForm.number_of_child_b++"
+                                        class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+
+                  <!-- 到着・交通手段 -->
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">到着予定時刻 *</label>
+                    <select v-model="editForm.check_in_time" class="block w-full px-4 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 transition">
+                        <option value="未定">未定</option>
+                        <option v-for="h in Array.from({length: 10}, (_, i) => i + 15)" :key="h" :value="`${h}:00`">{{ h }}:00</option>
+                        <option v-for="h in Array.from({length: 10}, (_, i) => i + 15)" :key="`${h}-30`" :value="`${h}:30`">{{ h }}:30</option>
+                        <option value="00:00">00:00</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">交通手段 *</label>
+                    <select v-model="editForm.transportation" class="block w-full px-4 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 transition">
+                        <option value="未定">未定</option>
+                        <option value="車">車</option>
+                        <option value="電車・バス">電車・バス</option>
+                        <option value="その他">その他</option>
+                    </select>
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">変更の備考（オーナーメモに追記されます）</label>
+                    <textarea v-model="editForm.remarks" rows="3" 
+                              placeholder="変更の理由などを入力してください（任意）"
+                              class="block w-full px-4 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-primary-500 transition text-sm"></textarea>
+                  </div>
+                </div>
+
+                <div class="pt-6 border-t border-slate-100 flex flex-col gap-3">
+                  <button type="submit" :disabled="editForm.processing"
+                          class="w-full py-4 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition shadow-xl shadow-primary-200 disabled:opacity-50">
+                    <span v-if="editForm.processing">保存中...</span>
+                    <span v-else>変更内容を保存する</span>
+                  </button>
+                  <button type="button" @click="showEditModal = false" :disabled="editForm.processing"
+                          class="w-full py-3 bg-white text-slate-400 text-sm font-bold hover:text-slate-600 transition">
+                    キャンセル
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

@@ -165,7 +165,7 @@ class ReservationController extends Controller
     }
 
     /**
-     * オーナーメモの更新
+     * 予約内容の更新（ゲスト情報・宿泊人数等）
      */
     public function update(Request $request, Reservation $reservation)
     {
@@ -176,12 +176,43 @@ class ReservationController extends Controller
         }
 
         $validated = $request->validate([
-            'owner_memo' => ['nullable', 'string', 'max:5000'],
+            'guest_name' => ['sometimes', 'required', 'string', 'max:255'],
+            'guest_email' => ['sometimes', 'nullable', 'email', 'max:255'],
+            'guest_phone' => ['sometimes', 'required', 'string', 'max:50'],
+            'number_of_adults' => ['sometimes', 'required', 'integer', 'min:1'],
+            'number_of_child_a' => ['sometimes', 'nullable', 'integer', 'min:0'],
+            'number_of_child_b' => ['sometimes', 'nullable', 'integer', 'min:0'],
+            'check_in_time' => ['sometimes', 'required', 'string', 'max:20'],
+            'transportation' => ['sometimes', 'required', 'string', 'max:50'],
+            'owner_memo' => ['sometimes', 'nullable', 'string', 'max:5000'],
+            'remarks' => ['nullable', 'string', 'max:1000'],
         ]);
+
+        // 人数内訳が更新された場合、合計人数を更新
+        if (isset($validated['number_of_adults']) || isset($validated['number_of_child_a']) || isset($validated['number_of_child_b'])) {
+            $adults = $request->input('number_of_adults', $reservation->number_of_adults);
+            $childA = $request->input('number_of_child_a', $reservation->number_of_child_a);
+            $childB = $request->input('number_of_child_b', $reservation->number_of_child_b);
+            $validated['number_of_guests'] = $adults + $childA + $childB;
+        }
+
+        // 備考(remarks)がある場合、オーナーメモに追記
+        if (!empty($validated['remarks'])) {
+            $timestamp = now()->format('Y/m/d H:i');
+            $newEntry = "予約情報変更({$timestamp})：{$validated['remarks']}";
+
+            $currentMemo = $validated['owner_memo'] ?? $reservation->owner_memo ?? '';
+            if (!empty($currentMemo)) {
+                $validated['owner_memo'] = $currentMemo . "\n" . $newEntry;
+            } else {
+                $validated['owner_memo'] = $newEntry;
+            }
+        }
+        unset($validated['remarks']);
 
         $reservation->update($validated);
 
-        return back()->with('success', 'オーナーメモを更新しました。');
+        return back()->with('success', '予約内容を更新しました。');
     }
 
     /**
