@@ -260,7 +260,8 @@
               <th class="px-6 py-3 min-w-[120px]">予約番号</th>
               <th class="px-6 py-3 min-w-[150px]">ゲスト名</th>
               <th class="px-6 py-3 min-w-[120px]">部屋</th>
-              <th class="px-6 py-3 min-w-[120px]">チェックイン</th>
+              <th class="px-6 py-3 min-w-[150px]">チェックイン</th>
+              <th class="px-6 py-3 min-w-[80px]">泊数</th>
               <th class="px-6 py-3 text-right min-w-[100px]">料金</th>
               <th class="px-6 py-3 text-center min-w-[80px]">操作</th>
             </tr>
@@ -272,9 +273,10 @@
                   {{ reservation.reservation_code }}
                 </Link>
               </td>
-              <td class="px-6 py-4 font-medium text-slate-800">{{ reservation.guest_name }}</td>
+              <td class="px-6 py-4 text-slate-800">{{ reservation.guest_name }}</td>
               <td class="px-6 py-4">{{ reservation.room_name }}</td>
-              <td class="px-6 py-4">{{ reservation.check_in_date }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ formatDateWithDay(reservation.check_in_date) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-slate-700">{{ getNightsCount(reservation.check_in_date, reservation.check_out_date) }}泊</td>
               <td class="px-6 py-4 text-right font-medium text-slate-800">¥{{ reservation.total_amount.toLocaleString() }}</td>
               <td class="px-6 py-4 text-center">
                 <Link :href="route('owner.reservations.show', reservation.uuid)" 
@@ -590,6 +592,25 @@ const formatMonth = (monthStr) => {
     if (!monthStr) return '';
     const [year, month] = monthStr.split('-');
     return `${year}年${parseInt(month)}月`;
+};
+
+const formatDateWithDay = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const day = days[date.getDay()];
+    return `${y}/${m}/${d}(${day})`;
+};
+
+const getNightsCount = (checkIn, checkOut) => {
+    if (!checkIn || !checkOut) return 0;
+    const ci = new Date(checkIn);
+    const co = new Date(checkOut);
+    const diffTime = co - ci;
+    return Math.round(diffTime / (1000 * 60 * 60 * 24));
 };
 
 const copied = ref(false);
