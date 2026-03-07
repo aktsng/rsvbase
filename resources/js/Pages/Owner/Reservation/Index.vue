@@ -311,7 +311,7 @@ const executeCancel = () => {
                 <th class="px-6 py-4 min-w-[80px]">泊数</th>
                 <th class="px-6 py-4 text-right min-w-[100px]">料金</th>
                 <th class="px-6 py-4 min-w-[100px]">ステータス</th>
-                <th class="px-6 py-4 text-center min-w-[150px]">操作</th>
+                <th class="px-6 py-4 text-center min-w-[160px]">操作</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -349,7 +349,7 @@ const executeCancel = () => {
                     <span v-else-if="res.payment_method === 'onsite'" class="text-[9px] font-bold text-emerald-600 border border-emerald-200 px-0.5 rounded bg-emerald-50">現地決済</span>
                   </div>
                 </td>
-                <td class="px-6 py-4 text-center space-x-2">
+                <td class="px-6 py-4 text-center space-x-2 whitespace-nowrap">
                   <Link :href="route('owner.reservations.show', res.uuid)" 
                         class="inline-block px-3 py-1.5 text-xs font-semibold text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-50 transition">
                     詳細
